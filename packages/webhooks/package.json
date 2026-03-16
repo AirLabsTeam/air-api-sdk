@@ -1,0 +1,16 @@
+{
+  "name": "@air/api-webhooks",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Webhook signature verification for Air API (placeholder)",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "scripts": {
+    "build": "echo 'Placeholder - no build'",
+    "test": "echo 'Placeholder - no tests'",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "license": "MIT"
+}

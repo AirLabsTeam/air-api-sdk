@@ -1,0 +1,16 @@
+{
+  "name": "air-api-sdk-monorepo",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "test": "bun run --filter '*' test",
+    "typecheck": "bun run --filter '*' typecheck",
+    "clean": "bun run --filter '*' clean",
+    "test:e2e": "bun test --env-file .env.test tests/e2e/"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

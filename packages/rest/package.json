@@ -1,0 +1,37 @@
+{
+  "name": "@air/api-rest",
+  "version": "0.1.0",
+  "description": "Typed REST client for Air API",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "bun run build:esm && bun run build:cjs && bun run build:types",
+    "build:esm": "bun build src/index.ts --outdir dist/esm --target node --format esm --external @air/api-core && echo '{\"type\":\"module\"}' > dist/esm/package.json",
+    "build:cjs": "bun build src/index.ts --outdir dist/cjs --target node --format cjs --external @air/api-core && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist/types",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@air/api-core": "workspace:*"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

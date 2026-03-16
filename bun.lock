@@ -1,0 +1,50 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "air-api-sdk-monorepo",
+      "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0",
+      },
+    },
+    "packages/core": {
+      "name": "@air/api-core",
+      "version": "0.1.0",
+    },
+    "packages/rest": {
+      "name": "@air/api-rest",
+      "version": "0.1.0",
+      "dependencies": {
+        "@air/api-core": "workspace:*",
+      },
+    },
+    "packages/sdk": {
+      "name": "@air/api-sdk",
+      "version": "0.1.0",
+      "dependencies": {
+        "@air/api-core": "workspace:*",
+        "@air/api-rest": "workspace:*",
+      },
+    },
+    "packages/webhooks": {
+      "name": "@air/api-webhooks",
+      "version": "0.0.1",
+    },
+  },
+  "packages": {
+    "@air/api-core": ["@air/api-core@workspace:packages/core"],
+
+    "@air/api-rest": ["@air/api-rest@workspace:packages/rest"],
+
+    "@air/api-sdk": ["@air/api-sdk@workspace:packages/sdk"],
+
+    "@air/api-webhooks": ["@air/api-webhooks@workspace:packages/webhooks"],
+
+    "@types/node": ["@types/node@20.19.37", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-8kzdPJ3FsNsVIurqBs7oodNnCEVbni9yUEkaHbgptDACOPW04jimGagZ51E6+lXUwJjgnBw+hyko/lkFWCldqw=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+  }
+}
