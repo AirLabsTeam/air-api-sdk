@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { isRetryableError, retryWithBackoff } from "../src/retry";
+import { isRetryableError, getRetryDelay, retryWithBackoff } from "../src/retry";
 import {
   APIError,
   BadRequestError,
@@ -42,6 +42,41 @@ describe("isRetryableError", () => {
 
   test("retries on TypeError (network error)", () => {
     expect(isRetryableError(new TypeError("fetch failed"))).toBe(true);
+  });
+
+  test("does not retry POST on 500", () => {
+    const err = new InternalServerError(500, {}, "server error", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(false);
+  });
+
+  test("does not retry POST on 502", () => {
+    const err = new APIError(502, {}, "bad gateway", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(false);
+  });
+
+  test("does not retry POST on 503", () => {
+    const err = new APIError(503, {}, "service unavailable", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(false);
+  });
+
+  test("does not retry POST on 504", () => {
+    const err = new APIError(504, {}, "gateway timeout", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(false);
+  });
+
+  test("retries POST on 429", () => {
+    const err = new RateLimitError(429, {}, "rate limited", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(true);
+  });
+
+  test("retries POST on 408", () => {
+    const err = new APIError(408, {}, "request timeout", new Headers());
+    expect(isRetryableError(err, "POST")).toBe(true);
+  });
+
+  test("retries GET on 500", () => {
+    const err = new InternalServerError(500, {}, "server error", new Headers());
+    expect(isRetryableError(err, "GET")).toBe(true);
   });
 });
 
@@ -93,5 +128,33 @@ describe("retryWithBackoff", () => {
       expect(e).toBeInstanceOf(InternalServerError);
     }
     expect(calls).toBe(3); // initial + 2 retries
+  });
+
+  test("does not retry POST on 5xx errors", async () => {
+    let calls = 0;
+    try {
+      await retryWithBackoff(
+        async () => {
+          calls++;
+          throw new InternalServerError(500, {}, "fail", new Headers());
+        },
+        3,
+        "POST",
+      );
+    } catch (e) {
+      expect(e).toBeInstanceOf(InternalServerError);
+    }
+    expect(calls).toBe(1);
+  });
+});
+
+describe("getRetryDelay", () => {
+  test("adds jitter to Retry-After header value", () => {
+    const headers = new Headers({ "retry-after": "2" });
+    const err = new RateLimitError(429, {}, "rate limited", headers);
+    const delay = getRetryDelay(err, 0);
+    // retryAfter is 2s = 2000ms, jitter adds up to 20% = 400ms
+    expect(delay).toBeGreaterThanOrEqual(2000);
+    expect(delay).toBeLessThanOrEqual(2400);
   });
 });

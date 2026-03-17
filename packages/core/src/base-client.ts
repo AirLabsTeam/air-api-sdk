@@ -53,7 +53,7 @@ export class AirBase {
   }
 
   async request<T>(options: RequestOptions): Promise<T> {
-    return retryWithBackoff(() => this._executeRequest<T>(options), this.maxRetries);
+    return retryWithBackoff(() => this._executeRequest<T>(options), this.maxRetries, options.method);
   }
 
   requestCursorPage<T>(
