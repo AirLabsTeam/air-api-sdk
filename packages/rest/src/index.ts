@@ -28,7 +28,6 @@ export { Tags } from "./resources/tags";
 export { CustomFields } from "./resources/custom-fields";
 export { Roles } from "./resources/roles";
 export { Imports } from "./resources/imports";
-export { AuditLogs } from "./resources/audit-logs";
 export { Uploads } from "./resources/uploads";
 
 // Export all types

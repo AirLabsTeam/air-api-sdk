@@ -1,6 +1,5 @@
 import { AirBase, type AirBaseOptions } from "@air/api-core";
 import { Assets } from "./resources/assets";
-import { AuditLogs } from "./resources/audit-logs";
 import { Boards } from "./resources/boards";
 import { CustomFields } from "./resources/custom-fields";
 import { Imports } from "./resources/imports";
@@ -17,7 +16,6 @@ export class AirApi extends AirBase {
   readonly customFields: CustomFields;
   readonly roles: Roles;
   readonly imports: Imports;
-  readonly auditLogs: AuditLogs;
   readonly uploads: Uploads;
 
   constructor(options: AirApiOptions = {}) {
@@ -29,7 +27,6 @@ export class AirApi extends AirBase {
     this.customFields = new CustomFields(this);
     this.roles = new Roles(this);
     this.imports = new Imports(this);
-    this.auditLogs = new AuditLogs(this);
     this.uploads = new Uploads(this);
   }
 }

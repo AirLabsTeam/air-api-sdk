@@ -245,16 +245,6 @@ const status = await air.imports.getStatus(imp.id);
 console.log(status.status); // 'pending' | 'inProgress' | 'succeeded' | 'failed'
 ```
 
-### Audit logs
-
-```ts
-const page = await air.auditLogs.list({
-  startDate: "2025-01-01T00:00:00Z",
-  endDate: "2025-01-31T23:59:59Z",
-  limit: 50,
-});
-```
-
 ## Pagination
 
 List methods return a `PagePromise` that supports two patterns:
