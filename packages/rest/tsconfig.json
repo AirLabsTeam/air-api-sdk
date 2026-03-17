@@ -4,7 +4,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "composite": true,
-    "noEmit": false
+    "noEmit": false,
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "tests"],

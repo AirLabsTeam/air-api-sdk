@@ -24,8 +24,8 @@
   "scripts": {
     "build": "tsup",
     "test": "echo 'No tests'",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "typecheck": "tsc -b",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@air/api-core": "*",

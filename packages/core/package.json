@@ -24,8 +24,8 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "typecheck": "tsc -b",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "engines": {
     "node": ">=18"
