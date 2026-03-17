@@ -3,14 +3,17 @@
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "build": "bun run --filter '*' build",
-    "test": "bun run --filter '*' test",
-    "typecheck": "bun run --filter '*' typecheck",
-    "clean": "bun run --filter '*' clean",
-    "test:e2e": "bun test --env-file .env.test tests/e2e/"
+    "build": "npm run -w packages/core build && npm run -w packages/rest build && npm run -w packages/sdk build",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "typecheck": "tsc -b",
+    "clean": "npm run --workspaces --if-present clean"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "dotenv": "^17.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }

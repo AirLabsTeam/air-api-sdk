@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import type { Asset, Board } from '@air/api-sdk';
 import { getClient, resourceName, SETUP_TIMEOUT, POLL_TIMEOUT } from './helpers/setup';
 import { findOrCreateBoard, ensureTestAsset, waitFor } from './helpers/test-data';

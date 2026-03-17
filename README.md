@@ -6,9 +6,9 @@ Typed JavaScript/TypeScript SDK for the [Air](https://air.inc) API.
 
 ```bash
 npm install @air/api-sdk
-```
-
-```bash
+# or
+yarn add @air/api-sdk
+# or
 bun add @air/api-sdk
 ```
 
@@ -314,18 +314,20 @@ Retryable errors (408, 429, 500, 502, 503, 504) are automatically retried with e
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) v1.x
+- Node.js >= 18 (or Bun, or any npm-compatible package manager)
 
 ### Setup
 
 ```bash
-bun install
+npm install
+# or: yarn install / bun install
 ```
 
 ### Build
 
 ```bash
-bun run build
+npm run build
+# or: yarn build / bun run build
 ```
 
 ### Tests
@@ -333,7 +335,8 @@ bun run build
 Unit tests:
 
 ```bash
-bun run test
+npm test
+# or: yarn test / bun run test
 ```
 
 End-to-end tests (requires API credentials):
@@ -341,7 +344,13 @@ End-to-end tests (requires API credentials):
 ```bash
 cp .env.example .env.test
 # fill in AIR_API_KEY and AIR_WORKSPACE_ID
-bun run test:e2e
+npm run test:e2e
+```
+
+### Type checking
+
+```bash
+npm run typecheck
 ```
 
 ### Packages
@@ -354,5 +363,5 @@ bun run test:e2e
 
 ## Requirements
 
-- Node.js >= 18 or Bun
-- TypeScript >= 5.0 (if using TypeScript)
+- Node.js >= 18
+- TypeScript >= 5.7 (if using TypeScript)

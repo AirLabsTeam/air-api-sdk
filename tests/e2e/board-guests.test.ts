@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import type { Board, Role } from '@air/api-sdk';
 import { BadRequestError } from '@air/api-sdk';
 import { getClient, resourceName } from './helpers/setup';

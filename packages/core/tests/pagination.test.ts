@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, test } from 'vitest';
 import { CursorPage } from '../src/pagination';
 
 describe('CursorPage', () => {
@@ -38,7 +38,7 @@ describe('CursorPage', () => {
       { data: [1], pagination: { hasMore: false, cursor: null } },
       null,
     );
-    expect(page.getNextPage()).rejects.toThrow('No more pages available');
+    await expect(page.getNextPage()).rejects.toThrow('No more pages available');
   });
 
   test('async iterator yields all items across pages', async () => {

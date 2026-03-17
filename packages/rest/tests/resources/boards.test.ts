@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, test } from 'vitest';
 import { AirApi } from '../../src/api';
 import { createMockFetch, createClientOptions } from '../helpers/mock-fetch';
 import { makeBoard, makePaginatedResponse } from '../helpers/fixtures';

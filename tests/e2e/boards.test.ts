@@ -1,4 +1,4 @@
-import { describe, test, expect, afterAll } from 'bun:test';
+import { describe, test, expect, afterAll } from 'vitest';
 import { getClient, resourceName } from './helpers/setup';
 
 const client = getClient();
