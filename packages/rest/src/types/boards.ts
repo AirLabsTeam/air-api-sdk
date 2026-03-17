@@ -1,5 +1,5 @@
-import type { AssetCustomFieldValue } from './assets';
-import type { CursorPageParams } from '@air/api-core';
+import type { AssetCustomFieldValue } from "./assets";
+import type { CursorPageParams } from "@air/api-core";
 
 export interface Board {
   id: string;

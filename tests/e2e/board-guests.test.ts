@@ -1,8 +1,8 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
-import type { Board, Role } from '@air/api-sdk';
-import { BadRequestError } from '@air/api-sdk';
-import { getClient, resourceName } from './helpers/setup';
-import { findOrCreateBoard } from './helpers/test-data';
+import { describe, test, expect, beforeAll, afterAll } from "vitest";
+import type { Board, Role } from "@air/api-sdk";
+import { BadRequestError } from "@air/api-sdk";
+import { getClient, resourceName as _resourceName } from "./helpers/setup";
+import { findOrCreateBoard } from "./helpers/test-data";
 
 const client = getClient();
 let board: Board;
@@ -12,19 +12,21 @@ const cleanup: (() => Promise<void>)[] = [];
 const TEST_GUEST_EMAIL = `e2e-test+${Date.now()}@example.com`;
 
 beforeAll(async () => {
-  board = await findOrCreateBoard(client, 'guests-board');
+  board = await findOrCreateBoard(client, "guests-board");
   cleanup.push(() => client.boards.delete(board.id));
-  roles = await client.roles.list({ type: 'guest' });
+  roles = await client.roles.list({ type: "guest" });
 });
 
 afterAll(async () => {
   for (const fn of cleanup) {
-    try { await fn(); } catch {}
+    try {
+      await fn();
+    } catch {}
   }
 });
 
-describe('Board Guests', () => {
-  test('addGuest → listGuests → filter by email → removeGuest', async () => {
+describe("Board Guests", () => {
+  test("addGuest → listGuests → filter by email → removeGuest", async () => {
     expect(roles.length).toBeGreaterThan(0);
     const role = roles[0];
 
@@ -36,8 +38,11 @@ describe('Board Guests', () => {
         roleId: role.id,
       });
     } catch (err) {
-      if (err instanceof BadRequestError && String(err.message).includes('maximum number of members')) {
-        console.log('Skipping board-guests test: workspace at member limit');
+      if (
+        err instanceof BadRequestError &&
+        String(err.message).includes("maximum number of members")
+      ) {
+        console.log("Skipping board-guests test: workspace at member limit");
         return;
       }
       throw err;

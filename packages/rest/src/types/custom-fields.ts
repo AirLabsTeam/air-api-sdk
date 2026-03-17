@@ -1,6 +1,6 @@
-import type { CursorPageParams } from '@air/api-core';
+import type { CursorPageParams } from "@air/api-core";
 
-export type CustomFieldType = 'single-select' | 'multi-select' | 'plain-text' | 'date';
+export type CustomFieldType = "single-select" | "multi-select" | "plain-text" | "date";
 
 export interface CustomFieldValue {
   id: string;

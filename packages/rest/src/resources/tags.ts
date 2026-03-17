@@ -1,5 +1,5 @@
-import type { AirBase, PagePromise } from '@air/api-core';
-import type { Tag, TagCreateParams, TagListParams, TagUpdateParams } from '../types/tags';
+import type { AirBase, PagePromise } from "@air/api-core";
+import type { Tag, TagCreateParams, TagListParams, TagUpdateParams } from "../types/tags";
 
 export class Tags {
   constructor(private client: AirBase) {}
@@ -7,8 +7,8 @@ export class Tags {
   list(params: TagListParams = {}): PagePromise<Tag> {
     return this.client.requestCursorPage<Tag>(
       {
-        method: 'GET',
-        path: '/tags',
+        method: "GET",
+        path: "/tags",
         query: params as Record<string, string | number | undefined>,
       },
       params as Record<string, string | number | undefined>,
@@ -17,22 +17,22 @@ export class Tags {
 
   async get(tagId: string): Promise<Tag> {
     return this.client.request<Tag>({
-      method: 'GET',
+      method: "GET",
       path: `/tags/${tagId}`,
     });
   }
 
   async create(params: TagCreateParams): Promise<Tag> {
     return this.client.request<Tag>({
-      method: 'POST',
-      path: '/tags',
+      method: "POST",
+      path: "/tags",
       body: params,
     });
   }
 
   async update(tagId: string, params: TagUpdateParams): Promise<void> {
     return this.client.request<void>({
-      method: 'PATCH',
+      method: "PATCH",
       path: `/tags/${tagId}`,
       body: params,
     });
@@ -40,7 +40,7 @@ export class Tags {
 
   async delete(tagId: string): Promise<void> {
     return this.client.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       path: `/tags/${tagId}`,
     });
   }

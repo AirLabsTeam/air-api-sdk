@@ -3,14 +3,9 @@ export class APIError extends Error {
   readonly headers: Headers;
   readonly body: unknown;
 
-  constructor(
-    status: number,
-    body: unknown,
-    message: string,
-    headers: Headers,
-  ) {
+  constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(message);
-    this.name = 'APIError';
+    this.name = "APIError";
     this.status = status;
     this.body = body;
     this.headers = headers;
@@ -24,11 +19,11 @@ export class APIError extends Error {
     try {
       body = await response.json();
       message =
-        typeof body === 'object' && body !== null && 'message' in body
+        typeof body === "object" && body !== null && "message" in body
           ? String((body as { message: string }).message)
           : `Request failed with status ${response.status}`;
     } catch {
-      body = await response.text().catch(() => '');
+      body = await response.text().catch(() => "");
       message = `Request failed with status ${response.status}`;
     }
 
@@ -57,28 +52,28 @@ export class APIError extends Error {
 export class BadRequestError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'BadRequestError';
+    this.name = "BadRequestError";
   }
 }
 
 export class AuthenticationError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
   }
 }
 
 export class PermissionError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'PermissionError';
+    this.name = "PermissionError";
   }
 }
 
 export class NotFoundError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
   }
 }
 
@@ -87,8 +82,8 @@ export class RateLimitError extends APIError {
 
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'RateLimitError';
-    const retryAfterHeader = headers.get('retry-after');
+    this.name = "RateLimitError";
+    const retryAfterHeader = headers.get("retry-after");
     this.retryAfter = retryAfterHeader ? Number(retryAfterHeader) : null;
   }
 }
@@ -96,20 +91,20 @@ export class RateLimitError extends APIError {
 export class InternalServerError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
-    this.name = 'InternalServerError';
+    this.name = "InternalServerError";
   }
 }
 
 export class ConnectionError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'ConnectionError';
+    this.name = "ConnectionError";
   }
 }
 
 export class TimeoutError extends ConnectionError {
-  constructor(message = 'Request timed out') {
+  constructor(message = "Request timed out") {
     super(message);
-    this.name = 'TimeoutError';
+    this.name = "TimeoutError";
   }
 }

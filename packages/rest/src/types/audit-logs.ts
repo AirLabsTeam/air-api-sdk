@@ -1,4 +1,4 @@
-import type { CursorPageParams } from '@air/api-core';
+import type { CursorPageParams } from "@air/api-core";
 
 export interface AuditLog {
   [key: string]: unknown;

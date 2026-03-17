@@ -6,11 +6,13 @@ export interface UploadCreateParams {
   recordedAt?: string;
   parentBoardId?: string;
   assetId?: string;
-  customFields?: {
-    id: string;
-    value?: string | null;
-    values?: { id: string }[] | null;
-  }[] | null;
+  customFields?:
+    | {
+        id: string;
+        value?: string | null;
+        values?: { id: string }[] | null;
+      }[]
+    | null;
   tags?: { id: string }[] | null;
 }
 
@@ -60,13 +62,19 @@ export interface UploadFileParams {
 export interface UploadFileOptions {
   parentBoardId?: string;
   assetId?: string;
-  customFields?: {
-    id: string;
-    value?: string | null;
-    values?: { id: string }[] | null;
-  }[] | null;
+  customFields?:
+    | {
+        id: string;
+        value?: string | null;
+        values?: { id: string }[] | null;
+      }[]
+    | null;
   tags?: { id: string }[] | null;
-  onProgress?: (progress: { percentage: number; uploadedBytes: number; totalBytes: number }) => void;
+  onProgress?: (progress: {
+    percentage: number;
+    uploadedBytes: number;
+    totalBytes: number;
+  }) => void;
 }
 
 export interface UploadFileResponse {

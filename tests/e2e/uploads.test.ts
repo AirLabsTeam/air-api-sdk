@@ -1,32 +1,34 @@
-import { describe, test, expect, afterAll } from 'vitest';
-import { getClient, resourceName } from './helpers/setup';
-import { findOrCreateBoard } from './helpers/test-data';
+import { describe, test, expect, afterAll } from "vitest";
+import { getClient, resourceName } from "./helpers/setup";
+import { findOrCreateBoard } from "./helpers/test-data";
 
 const client = getClient();
 const cleanup: (() => Promise<void>)[] = [];
 
 afterAll(async () => {
   for (const fn of cleanup) {
-    try { await fn(); } catch {}
+    try {
+      await fn();
+    } catch {}
   }
 });
 
 // 1x1 red PNG
 const TINY_PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==',
-  'base64',
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==",
+  "base64",
 );
 
-describe('Uploads', () => {
-  test('low-level: create upload → PUT to presigned URL → delete asset', async () => {
-    const board = await findOrCreateBoard(client, 'uploads-board');
+describe("Uploads", () => {
+  test("low-level: create upload → PUT to presigned URL → delete asset", async () => {
+    const board = await findOrCreateBoard(client, "uploads-board");
     cleanup.push(() => client.boards.delete(board.id));
 
     const upload = await client.uploads.create({
-      fileName: resourceName('low-level'),
-      ext: 'png',
+      fileName: resourceName("low-level"),
+      ext: "png",
       size: TINY_PNG.byteLength,
-      mime: 'image/png',
+      mime: "image/png",
       parentBoardId: board.id,
     });
 
@@ -34,9 +36,9 @@ describe('Uploads', () => {
     expect(upload.versionId).toBeDefined();
 
     // Upload is a SmallUploadResponse if < 5GB
-    if ('uploadUrl' in upload) {
+    if ("uploadUrl" in upload) {
       const response = await fetch(upload.uploadUrl, {
-        method: 'PUT',
+        method: "PUT",
         body: TINY_PNG,
       });
       expect(response.ok).toBe(true);
@@ -46,16 +48,16 @@ describe('Uploads', () => {
     cleanup.push(() => client.assets.delete(upload.assetId));
   });
 
-  test('high-level: uploadFile with buffer + progress → delete asset', async () => {
-    const board = await findOrCreateBoard(client, 'uploads-board');
+  test("high-level: uploadFile with buffer + progress → delete asset", async () => {
+    const board = await findOrCreateBoard(client, "uploads-board");
 
     const progress: number[] = [];
     const result = await client.uploads.uploadFile(
       {
         buffer: TINY_PNG,
-        fileName: resourceName('high-level'),
-        ext: 'png',
-        mime: 'image/png',
+        fileName: resourceName("high-level"),
+        ext: "png",
+        mime: "image/png",
       },
       {
         parentBoardId: board.id,

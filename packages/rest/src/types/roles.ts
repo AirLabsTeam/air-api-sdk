@@ -7,7 +7,7 @@ export interface Role {
 }
 
 export interface RoleListParams {
-  type: 'guest';
+  type: "guest";
 }
 
 export interface RoleListResponse {

@@ -1,5 +1,5 @@
-import type { AirApi } from '@air/api-sdk';
-import { resourceName } from './setup';
+import type { AirApi } from "@air/api-sdk";
+import { resourceName } from "./setup";
 
 /**
  * Poll until a condition is true, with retries and delay between attempts.
@@ -34,12 +34,12 @@ export async function ensureTestAsset(client: AirApi, boardId: string) {
 
   // Upload a tiny PNG (1x1 pixel) into the board
   const png = Buffer.from(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
-    'base64',
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+    "base64",
   );
 
   const result = await client.uploads.uploadFile(
-    { buffer: png, fileName: resourceName('test-asset'), ext: 'png', mime: 'image/png' },
+    { buffer: png, fileName: resourceName("test-asset"), ext: "png", mime: "image/png" },
     { parentBoardId: boardId },
   );
 
@@ -51,7 +51,9 @@ export async function cleanupResources(client: AirApi, runId: string) {
   try {
     const boards = await client.boards.list({ name: runId });
     for (const board of boards.data) {
-      try { await client.boards.delete(board.id); } catch {}
+      try {
+        await client.boards.delete(board.id);
+      } catch {}
     }
   } catch {}
 
@@ -59,7 +61,9 @@ export async function cleanupResources(client: AirApi, runId: string) {
   try {
     const tags = await client.tags.list({ name: runId });
     for (const tag of tags.data) {
-      try { await client.tags.delete(tag.id); } catch {}
+      try {
+        await client.tags.delete(tag.id);
+      } catch {}
     }
   } catch {}
 
@@ -67,7 +71,9 @@ export async function cleanupResources(client: AirApi, runId: string) {
   try {
     for await (const cf of client.customFields.list()) {
       if (cf.name.startsWith(runId)) {
-        try { await client.customFields.delete(cf.id); } catch {}
+        try {
+          await client.customFields.delete(cf.id);
+        } catch {}
       }
     }
   } catch {}

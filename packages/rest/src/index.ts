@@ -1,4 +1,4 @@
-export { AirApi, type AirApiOptions } from './api';
+export { AirApi, type AirApiOptions } from "./api";
 
 // Re-export core for convenience
 export {
@@ -19,17 +19,17 @@ export {
   type CursorPageResponse,
   type RequestOptions,
   VERSION,
-} from '@air/api-core';
+} from "@air/api-core";
 
 // Export resource classes
-export { Assets } from './resources/assets';
-export { Boards } from './resources/boards';
-export { Tags } from './resources/tags';
-export { CustomFields } from './resources/custom-fields';
-export { Roles } from './resources/roles';
-export { Imports } from './resources/imports';
-export { AuditLogs } from './resources/audit-logs';
-export { Uploads } from './resources/uploads';
+export { Assets } from "./resources/assets";
+export { Boards } from "./resources/boards";
+export { Tags } from "./resources/tags";
+export { CustomFields } from "./resources/custom-fields";
+export { Roles } from "./resources/roles";
+export { Imports } from "./resources/imports";
+export { AuditLogs } from "./resources/audit-logs";
+export { Uploads } from "./resources/uploads";
 
 // Export all types
-export * from './types/index';
+export * from "./types/index";

@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise } from '@air/api-core';
+import type { AirBase, PagePromise } from "@air/api-core";
 import type {
   AddBoardAssetsParams,
   AddGuestParams,
@@ -11,7 +11,7 @@ import type {
   GuestListResponse,
   SetBoardCustomFieldParams,
   UpdateGuestParams,
-} from '../types/boards';
+} from "../types/boards";
 
 export class Boards {
   constructor(private client: AirBase) {}
@@ -28,30 +28,27 @@ export class Boards {
       query.customField = params.customField;
     }
 
-    return this.client.requestCursorPage<Board>(
-      { method: 'GET', path: '/boards', query },
-      query,
-    );
+    return this.client.requestCursorPage<Board>({ method: "GET", path: "/boards", query }, query);
   }
 
   async get(boardId: string): Promise<Board> {
     return this.client.request<Board>({
-      method: 'GET',
+      method: "GET",
       path: `/boards/${boardId}`,
     });
   }
 
   async create(params: BoardCreateParams): Promise<Board> {
     return this.client.request<Board>({
-      method: 'POST',
-      path: '/boards',
+      method: "POST",
+      path: "/boards",
       body: params,
     });
   }
 
   async update(boardId: string, params: BoardUpdateParams): Promise<void> {
     return this.client.request<void>({
-      method: 'PATCH',
+      method: "PATCH",
       path: `/boards/${boardId}`,
       body: params,
     });
@@ -59,14 +56,14 @@ export class Boards {
 
   async delete(boardId: string): Promise<void> {
     return this.client.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       path: `/boards/${boardId}`,
     });
   }
 
   async addAssets(boardId: string, params: AddBoardAssetsParams): Promise<void> {
     return this.client.request<void>({
-      method: 'POST',
+      method: "POST",
       path: `/boards/${boardId}/assets`,
       body: params,
     });
@@ -74,14 +71,18 @@ export class Boards {
 
   async removeAsset(boardId: string, assetId: string): Promise<void> {
     return this.client.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       path: `/boards/${boardId}/assets/${assetId}`,
     });
   }
 
-  async setCustomField(boardId: string, customFieldId: string, params: SetBoardCustomFieldParams): Promise<void> {
+  async setCustomField(
+    boardId: string,
+    customFieldId: string,
+    params: SetBoardCustomFieldParams,
+  ): Promise<void> {
     return this.client.request<void>({
-      method: 'PUT',
+      method: "PUT",
       path: `/boards/${boardId}/customFields/${customFieldId}`,
       body: params,
     });
@@ -89,7 +90,7 @@ export class Boards {
 
   async addGuest(boardId: string, params: AddGuestParams): Promise<Guest> {
     return this.client.request<Guest>({
-      method: 'POST',
+      method: "POST",
       path: `/boards/${boardId}/guests`,
       body: params,
     });
@@ -97,7 +98,7 @@ export class Boards {
 
   async listGuests(boardId: string, params: GuestListParams = {}): Promise<Guest[]> {
     const response = await this.client.request<GuestListResponse>({
-      method: 'GET',
+      method: "GET",
       path: `/boards/${boardId}/guests`,
       query: params.email ? { email: params.email } : undefined,
     });
@@ -106,7 +107,7 @@ export class Boards {
 
   async updateGuest(boardId: string, guestId: string, params: UpdateGuestParams): Promise<void> {
     return this.client.request<void>({
-      method: 'PATCH',
+      method: "PATCH",
       path: `/boards/${boardId}/guests/${guestId}`,
       body: params,
     });
@@ -114,7 +115,7 @@ export class Boards {
 
   async removeGuest(boardId: string, guestId: string): Promise<void> {
     return this.client.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       path: `/boards/${boardId}/guests/${guestId}`,
     });
   }

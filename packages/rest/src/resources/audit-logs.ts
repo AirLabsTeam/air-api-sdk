@@ -1,5 +1,5 @@
-import type { AirBase, PagePromise } from '@air/api-core';
-import type { AuditLog, AuditLogListParams } from '../types/audit-logs';
+import type { AirBase, PagePromise } from "@air/api-core";
+import type { AuditLog, AuditLogListParams } from "../types/audit-logs";
 
 export class AuditLogs {
   constructor(private client: AirBase) {}
@@ -14,7 +14,7 @@ export class AuditLogs {
     };
 
     return this.client.requestCursorPage<AuditLog>(
-      { method: 'GET', path: '/auditLogs', query },
+      { method: "GET", path: "/auditLogs", query },
       query,
     );
   }

@@ -1,4 +1,4 @@
-import { APIError, RateLimitError } from './errors';
+import { APIError, RateLimitError } from "./errors";
 
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504]);
 
@@ -13,11 +13,7 @@ export function isRetryableError(error: unknown): boolean {
   return false;
 }
 
-export function getRetryDelay(
-  error: unknown,
-  attempt: number,
-  baseDelay = 500,
-): number {
+export function getRetryDelay(error: unknown, attempt: number, baseDelay = 500): number {
   // Respect Retry-After header for rate limit errors
   if (error instanceof RateLimitError && error.retryAfter !== null) {
     return error.retryAfter * 1000;
@@ -29,10 +25,7 @@ export function getRetryDelay(
   return exponentialDelay + jitter;
 }
 
-export async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number,
-): Promise<T> {
+export async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries: number): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {

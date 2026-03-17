@@ -1,4 +1,4 @@
-import { AirApi } from '@air/api-sdk';
+import { AirApi } from "@air/api-sdk";
 
 export const RUN_ID = `e2e-${Date.now()}`;
 
@@ -14,7 +14,7 @@ export function getClient(): AirApi {
 
   if (!apiKey || !workspaceId) {
     throw new Error(
-      'Missing AIR_API_KEY or AIR_WORKSPACE_ID. Copy .env.example to .env.test and fill in credentials.',
+      "Missing AIR_API_KEY or AIR_WORKSPACE_ID. Copy .env.example to .env.test and fill in credentials.",
     );
   }
 

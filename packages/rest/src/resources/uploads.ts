@@ -1,4 +1,4 @@
-import type { AirBase } from '@air/api-core';
+import type { AirBase } from "@air/api-core";
 import type {
   CompleteMultipartParams,
   GetPartUploadUrlParams,
@@ -10,9 +10,9 @@ import type {
   UploadFileOptions,
   UploadFileParams,
   UploadFileResponse,
-} from '../types/uploads';
+} from "../types/uploads";
 
-const MULTIPART_THRESHOLD = 5e9; // 5GB
+const _MULTIPART_THRESHOLD = 5e9; // 5GB
 const DEFAULT_PART_SIZE = 100 * 1024 * 1024; // 100MB
 
 export class Uploads {
@@ -20,24 +20,24 @@ export class Uploads {
 
   async create(params: UploadCreateParams): Promise<UploadCreateResponse> {
     return this.client.request<UploadCreateResponse>({
-      method: 'POST',
-      path: '/uploads',
+      method: "POST",
+      path: "/uploads",
       body: params,
     });
   }
 
   async getPartUploadUrl(params: GetPartUploadUrlParams): Promise<GetPartUploadUrlResponse> {
     return this.client.request<GetPartUploadUrlResponse>({
-      method: 'POST',
-      path: '/uploads/uploadPart',
+      method: "POST",
+      path: "/uploads/uploadPart",
       body: params,
     });
   }
 
   async completeMultipart(params: CompleteMultipartParams): Promise<void> {
     return this.client.request<void>({
-      method: 'POST',
-      path: '/uploads/completeMultipart',
+      method: "POST",
+      path: "/uploads/completeMultipart",
       body: params,
     });
   }
@@ -71,12 +71,12 @@ export class Uploads {
   private async _uploadSmallFile(
     url: string,
     data: Buffer | ArrayBuffer | Uint8Array,
-    onProgress?: UploadFileOptions['onProgress'],
+    onProgress?: UploadFileOptions["onProgress"],
     totalSize?: number,
   ): Promise<void> {
     const fetchFn = this.client.fetchFn;
     const response = await fetchFn(url, {
-      method: 'PUT',
+      method: "PUT",
       body: data,
     });
 
@@ -93,7 +93,7 @@ export class Uploads {
     uploadInfo: LargeUploadResponse,
     data: Buffer | ArrayBuffer | Uint8Array,
     totalSize: number,
-    onProgress?: UploadFileOptions['onProgress'],
+    onProgress?: UploadFileOptions["onProgress"],
   ): Promise<void> {
     const { multiPartUploadId, key } = uploadInfo;
     const buffer = data instanceof Buffer ? data : Buffer.from(data as ArrayLike<number>);
@@ -115,7 +115,7 @@ export class Uploads {
       });
 
       const response = await fetchFn(url, {
-        method: 'PUT',
+        method: "PUT",
         body: chunk,
       });
 
@@ -123,7 +123,7 @@ export class Uploads {
         throw new Error(`Part ${partNumber} upload failed with status ${response.status}`);
       }
 
-      const etag = response.headers.get('etag');
+      const etag = response.headers.get("etag");
       if (!etag) {
         throw new Error(`Part ${partNumber} upload did not return an ETag`);
       }
@@ -145,7 +145,7 @@ export class Uploads {
 }
 
 function isSmallUpload(response: UploadCreateResponse): response is SmallUploadResponse {
-  return 'uploadUrl' in response;
+  return "uploadUrl" in response;
 }
 
 async function resolveFileData(params: UploadFileParams): Promise<{
@@ -156,67 +156,76 @@ async function resolveFileData(params: UploadFileParams): Promise<{
   size: number;
 }> {
   if (params.filePath) {
-    const fs = await import('fs');
-    const path = await import('path');
+    const fs = await import("fs");
+    const path = await import("path");
     const fileData = fs.readFileSync(params.filePath);
     const parsed = path.parse(params.filePath);
     const fileName = params.fileName ?? parsed.name;
-    const ext = params.ext ?? parsed.ext.replace(/^\./, '');
+    const ext = params.ext ?? parsed.ext.replace(/^\./, "");
     const mime = params.mime ?? guessMime(ext);
     return { fileData, fileName, ext, mime, size: fileData.byteLength };
   }
 
   if (params.buffer) {
-    const data = params.buffer instanceof Buffer ? params.buffer : Buffer.from(params.buffer as ArrayLike<number>);
+    const data =
+      params.buffer instanceof Buffer
+        ? params.buffer
+        : Buffer.from(params.buffer as ArrayLike<number>);
     if (!params.fileName || !params.ext) {
-      throw new Error('fileName and ext are required when uploading from a buffer');
+      throw new Error("fileName and ext are required when uploading from a buffer");
     }
     const mime = params.mime ?? guessMime(params.ext);
-    return { fileData: data, fileName: params.fileName, ext: params.ext, mime, size: data.byteLength };
+    return {
+      fileData: data,
+      fileName: params.fileName,
+      ext: params.ext,
+      mime,
+      size: data.byteLength,
+    };
   }
 
   if (params.file) {
     const arrayBuffer = await params.file.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);
     const name = params.file.name;
-    const dotIndex = name.lastIndexOf('.');
+    const dotIndex = name.lastIndexOf(".");
     const fileName = params.fileName ?? (dotIndex > 0 ? name.substring(0, dotIndex) : name);
-    const ext = params.ext ?? (dotIndex > 0 ? name.substring(dotIndex + 1) : '');
+    const ext = params.ext ?? (dotIndex > 0 ? name.substring(dotIndex + 1) : "");
     const mime = params.mime ?? (params.file.type || guessMime(ext));
     return { fileData: data, fileName, ext, mime, size: data.byteLength };
   }
 
-  throw new Error('One of filePath, buffer, or file must be provided');
+  throw new Error("One of filePath, buffer, or file must be provided");
 }
 
 function guessMime(ext: string): string {
   const mimeMap: Record<string, string> = {
-    jpg: 'image/jpeg',
-    jpeg: 'image/jpeg',
-    png: 'image/png',
-    gif: 'image/gif',
-    webp: 'image/webp',
-    svg: 'image/svg+xml',
-    mp4: 'video/mp4',
-    mov: 'video/quicktime',
-    avi: 'video/x-msvideo',
-    webm: 'video/webm',
-    mp3: 'audio/mpeg',
-    wav: 'audio/wav',
-    pdf: 'application/pdf',
-    doc: 'application/msword',
-    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    xls: 'application/vnd.ms-excel',
-    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ppt: 'application/vnd.ms-powerpoint',
-    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    zip: 'application/zip',
-    psd: 'image/vnd.adobe.photoshop',
-    ai: 'application/postscript',
-    eps: 'application/postscript',
-    tif: 'image/tiff',
-    tiff: 'image/tiff',
-    bmp: 'image/bmp',
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    svg: "image/svg+xml",
+    mp4: "video/mp4",
+    mov: "video/quicktime",
+    avi: "video/x-msvideo",
+    webm: "video/webm",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    zip: "application/zip",
+    psd: "image/vnd.adobe.photoshop",
+    ai: "application/postscript",
+    eps: "application/postscript",
+    tif: "image/tiff",
+    tiff: "image/tiff",
+    bmp: "image/bmp",
   };
-  return mimeMap[ext.toLowerCase()] ?? 'application/octet-stream';
+  return mimeMap[ext.toLowerCase()] ?? "application/octet-stream";
 }

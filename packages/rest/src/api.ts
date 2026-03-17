@@ -1,12 +1,12 @@
-import { AirBase, type AirBaseOptions } from '@air/api-core';
-import { Assets } from './resources/assets';
-import { AuditLogs } from './resources/audit-logs';
-import { Boards } from './resources/boards';
-import { CustomFields } from './resources/custom-fields';
-import { Imports } from './resources/imports';
-import { Roles } from './resources/roles';
-import { Tags } from './resources/tags';
-import { Uploads } from './resources/uploads';
+import { AirBase, type AirBaseOptions } from "@air/api-core";
+import { Assets } from "./resources/assets";
+import { AuditLogs } from "./resources/audit-logs";
+import { Boards } from "./resources/boards";
+import { CustomFields } from "./resources/custom-fields";
+import { Imports } from "./resources/imports";
+import { Roles } from "./resources/roles";
+import { Tags } from "./resources/tags";
+import { Uploads } from "./resources/uploads";
 
 export interface AirApiOptions extends AirBaseOptions {}
 

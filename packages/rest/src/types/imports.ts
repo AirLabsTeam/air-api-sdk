@@ -7,11 +7,13 @@ export interface ImportCreateParams {
   assetId?: string;
   description?: string;
   title?: string;
-  customFields?: {
-    id: string;
-    value?: string | null;
-    values?: { id: string }[] | null;
-  }[] | null;
+  customFields?:
+    | {
+        id: string;
+        value?: string | null;
+        values?: { id: string }[] | null;
+      }[]
+    | null;
   tags?: { id: string }[] | null;
 }
 
@@ -21,7 +23,7 @@ export interface ImportCreateResponse {
   versionId: string;
 }
 
-export type ImportStatus = 'pending' | 'inProgress' | 'succeeded' | 'failed';
+export type ImportStatus = "pending" | "inProgress" | "succeeded" | "failed";
 
 export interface ImportStatusResponse {
   status: ImportStatus;

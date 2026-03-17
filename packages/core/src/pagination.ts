@@ -1,4 +1,4 @@
-import type { CursorPageResponse } from './types';
+import type { CursorPageResponse } from "./types";
 
 export class CursorPage<T> implements AsyncIterable<T> {
   readonly data: T[];
@@ -23,7 +23,7 @@ export class CursorPage<T> implements AsyncIterable<T> {
 
   async getNextPage(): Promise<CursorPage<T>> {
     if (!this.hasNextPage() || !this._fetchNextPage) {
-      throw new Error('No more pages available');
+      throw new Error("No more pages available");
     }
     return this._fetchNextPage(this.pagination.cursor!);
   }

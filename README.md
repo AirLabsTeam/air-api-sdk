@@ -15,11 +15,11 @@ bun add @air/api-sdk
 ## Quick start
 
 ```ts
-import { AirApi } from '@air/api-sdk';
+import { AirApi } from "@air/api-sdk";
 
 const air = new AirApi({
-  apiKey: 'your-api-key',
-  workspaceId: 'your-workspace-id',
+  apiKey: "your-api-key",
+  workspaceId: "your-workspace-id",
 });
 
 // List boards
@@ -44,14 +44,15 @@ const air = new AirApi(); // reads from env
 
 ```ts
 const air = new AirApi({
-  apiKey: 'your-api-key',       // or AIR_API_KEY env var
-  workspaceId: 'your-workspace-id', // or AIR_WORKSPACE_ID env var
-  baseURL: 'https://api.air.inc/v1', // default
-  maxRetries: 3,                     // default, with exponential backoff
-  timeout: 60_000,                   // default, in milliseconds
-  defaultHeaders: {                  // optional, sent with every request
-    'user-agent': 'my-app/1.0',
-    'x-custom-header': 'value',
+  apiKey: "your-api-key", // or AIR_API_KEY env var
+  workspaceId: "your-workspace-id", // or AIR_WORKSPACE_ID env var
+  baseURL: "https://api.air.inc/v1", // default
+  maxRetries: 3, // default, with exponential backoff
+  timeout: 60_000, // default, in milliseconds
+  defaultHeaders: {
+    // optional, sent with every request
+    "user-agent": "my-app/1.0",
+    "x-custom-header": "value",
   },
 });
 ```
@@ -62,11 +63,11 @@ Use `defaultHeaders` to attach headers to every request. This is useful for over
 
 ```ts
 const air = new AirApi({
-  apiKey: 'your-api-key',
-  workspaceId: 'your-workspace-id',
+  apiKey: "your-api-key",
+  workspaceId: "your-workspace-id",
   defaultHeaders: {
-    'user-agent': 'my-app/1.0',
-    'x-air-client-source': 'my-integration',
+    "user-agent": "my-app/1.0",
+    "x-air-client-source": "my-integration",
   },
 });
 ```
@@ -86,30 +87,33 @@ Headers are merged in order of precedence (last wins):
 const page = await air.boards.list({ limit: 10 });
 
 // Filter by name or parent
-const filtered = await air.boards.list({ name: 'My Board', parentBoardId: 'board-id' });
+const filtered = await air.boards.list({ name: "My Board", parentBoardId: "board-id" });
 
 // CRUD
-const board = await air.boards.create({ title: 'New Board', description: 'Optional' });
+const board = await air.boards.create({ title: "New Board", description: "Optional" });
 const fetched = await air.boards.get(board.id);
-await air.boards.update(board.id, { title: 'Renamed' });
+await air.boards.update(board.id, { title: "Renamed" });
 await air.boards.delete(board.id);
 
 // Sub-boards
-const child = await air.boards.create({ title: 'Child', parentBoardId: board.id });
+const child = await air.boards.create({ title: "Child", parentBoardId: board.id });
 
 // Board assets
-await air.boards.addAssets(board.id, { assetIds: ['asset-id-1', 'asset-id-2'] });
-await air.boards.removeAsset(board.id, 'asset-id-1');
+await air.boards.addAssets(board.id, { assetIds: ["asset-id-1", "asset-id-2"] });
+await air.boards.removeAsset(board.id, "asset-id-1");
 
 // Board custom fields
-await air.boards.setCustomField(board.id, 'custom-field-id', { value: 'hello' });
-await air.boards.setCustomField(board.id, 'custom-field-id', { value: null }); // clear
+await air.boards.setCustomField(board.id, "custom-field-id", { value: "hello" });
+await air.boards.setCustomField(board.id, "custom-field-id", { value: null }); // clear
 
 // Guest management
-const guest = await air.boards.addGuest(board.id, { email: 'guest@example.com', roleId: 'role-id' });
+const guest = await air.boards.addGuest(board.id, {
+  email: "guest@example.com",
+  roleId: "role-id",
+});
 const guests = await air.boards.listGuests(board.id);
-const filtered = await air.boards.listGuests(board.id, { email: 'guest@example.com' });
-await air.boards.updateGuest(board.id, guest.id, { roleId: 'new-role-id' });
+const filtered = await air.boards.listGuests(board.id, { email: "guest@example.com" });
+await air.boards.updateGuest(board.id, guest.id, { roleId: "new-role-id" });
 await air.boards.removeGuest(board.id, guest.id);
 ```
 
@@ -117,43 +121,43 @@ await air.boards.removeGuest(board.id, guest.id);
 
 ```ts
 // List assets (supports filtering by board, tags, custom fields, search, date range)
-const page = await air.assets.list({ parentBoardId: 'board-id', limit: 20 });
-const searched = await air.assets.list({ search: 'logo' });
+const page = await air.assets.list({ parentBoardId: "board-id", limit: 20 });
+const searched = await air.assets.list({ search: "logo" });
 
 // Get and delete
-const asset = await air.assets.get('asset-id');
-await air.assets.delete('asset-id');
+const asset = await air.assets.get("asset-id");
+await air.assets.delete("asset-id");
 
 // Custom fields on assets
-await air.assets.setCustomField('asset-id', 'cf-id', { value: 'text value' });
-await air.assets.setCustomField('asset-id', 'cf-id', { values: [{ id: 'value-id' }] }); // select fields
+await air.assets.setCustomField("asset-id", "cf-id", { value: "text value" });
+await air.assets.setCustomField("asset-id", "cf-id", { values: [{ id: "value-id" }] }); // select fields
 
 // List boards an asset belongs to
-const boards = await air.assets.listBoards('asset-id');
+const boards = await air.assets.listBoards("asset-id");
 ```
 
 ### Asset versions
 
 ```ts
-const { data: versions } = await air.assets.listVersions('asset-id');
-const version = await air.assets.getVersion('asset-id', 'version-id');
-await air.assets.updateVersion('asset-id', 'version-id', { title: 'New title' });
+const { data: versions } = await air.assets.listVersions("asset-id");
+const version = await air.assets.getVersion("asset-id", "version-id");
+await air.assets.updateVersion("asset-id", "version-id", { title: "New title" });
 
 // Download URL
-const { url } = await air.assets.getVersionDownloadUrl('asset-id', 'version-id');
+const { url } = await air.assets.getVersionDownloadUrl("asset-id", "version-id");
 
 // Version tags
-await air.assets.addVersionTag('asset-id', 'version-id', { id: 'tag-id' });
-await air.assets.removeVersionTag('asset-id', 'version-id', 'tag-id');
+await air.assets.addVersionTag("asset-id", "version-id", { id: "tag-id" });
+await air.assets.removeVersionTag("asset-id", "version-id", "tag-id");
 ```
 
 ### Tags
 
 ```ts
 const page = await air.tags.list();
-const tag = await air.tags.create({ name: 'My Tag' });
+const tag = await air.tags.create({ name: "My Tag" });
 const fetched = await air.tags.get(tag.id);
-await air.tags.update(tag.id, { name: 'Renamed Tag' });
+await air.tags.update(tag.id, { name: "Renamed Tag" });
 await air.tags.delete(tag.id);
 ```
 
@@ -163,23 +167,23 @@ await air.tags.delete(tag.id);
 // List and CRUD
 const page = await air.customFields.list();
 const cf = await air.customFields.create({
-  name: 'Status',
-  type: 'single-select',       // 'single-select' | 'multi-select' | 'plain-text' | 'date'
-  values: [{ name: 'Active' }, { name: 'Archived' }],
+  name: "Status",
+  type: "single-select", // 'single-select' | 'multi-select' | 'plain-text' | 'date'
+  values: [{ name: "Active" }, { name: "Archived" }],
 });
-await air.customFields.update(cf.id, { name: 'Project Status' });
+await air.customFields.update(cf.id, { name: "Project Status" });
 await air.customFields.delete(cf.id);
 
 // Manage select field values
-const value = await air.customFields.createValue(cf.id, { name: 'In Review' });
-await air.customFields.updateValue(cf.id, value.id, { name: 'Under Review' });
+const value = await air.customFields.createValue(cf.id, { name: "In Review" });
+await air.customFields.updateValue(cf.id, value.id, { name: "Under Review" });
 await air.customFields.deleteValue(cf.id, value.id);
 ```
 
 ### Roles
 
 ```ts
-const roles = await air.roles.list({ type: 'guest' });
+const roles = await air.roles.list({ type: "guest" });
 // Returns: [{ id, name, description, billable, type }]
 ```
 
@@ -188,22 +192,22 @@ const roles = await air.roles.list({ type: 'guest' });
 ```ts
 // High-level upload — from file path
 const result = await air.uploads.uploadFile(
-  { filePath: './photo.png' },
-  { parentBoardId: 'board-id' },
+  { filePath: "./photo.png" },
+  { parentBoardId: "board-id" },
 );
 console.log(result.assetId, result.versionId);
 
 // From buffer
 const result = await air.uploads.uploadFile(
-  { buffer: myBuffer, fileName: 'photo', ext: 'png', mime: 'image/png' },
-  { parentBoardId: 'board-id' },
+  { buffer: myBuffer, fileName: "photo", ext: "png", mime: "image/png" },
+  { parentBoardId: "board-id" },
 );
 
 // With progress tracking
 await air.uploads.uploadFile(
-  { filePath: './video.mp4' },
+  { filePath: "./video.mp4" },
   {
-    parentBoardId: 'board-id',
+    parentBoardId: "board-id",
     onProgress: ({ percentage, uploadedBytes, totalBytes }) => {
       console.log(`${percentage}% (${uploadedBytes}/${totalBytes})`);
     },
@@ -212,11 +216,11 @@ await air.uploads.uploadFile(
 
 // With tags and custom fields
 await air.uploads.uploadFile(
-  { filePath: './doc.pdf' },
+  { filePath: "./doc.pdf" },
   {
-    parentBoardId: 'board-id',
-    tags: [{ id: 'tag-id' }],
-    customFields: [{ id: 'cf-id', value: 'some value' }],
+    parentBoardId: "board-id",
+    tags: [{ id: "tag-id" }],
+    customFields: [{ id: "cf-id", value: "some value" }],
   },
 );
 ```
@@ -230,9 +234,9 @@ For low-level control, use `air.uploads.create()` directly to get a presigned UR
 ```ts
 // Import from URL
 const imp = await air.imports.create({
-  sourceUrl: 'https://example.com/image.png',
-  parentBoardId: 'board-id',
-  title: 'Imported Image',
+  sourceUrl: "https://example.com/image.png",
+  parentBoardId: "board-id",
+  title: "Imported Image",
 });
 console.log(imp.id, imp.assetId);
 
@@ -245,8 +249,8 @@ console.log(status.status); // 'pending' | 'inProgress' | 'succeeded' | 'failed'
 
 ```ts
 const page = await air.auditLogs.list({
-  startDate: '2025-01-01T00:00:00Z',
-  endDate: '2025-01-31T23:59:59Z',
+  startDate: "2025-01-01T00:00:00Z",
+  endDate: "2025-01-31T23:59:59Z",
   limit: 50,
 });
 ```
@@ -268,8 +272,8 @@ for await (const asset of air.assets.list({ limit: 50 })) {
 
 ```ts
 const page = await air.assets.list({ limit: 50 });
-console.log(page.data);       // current page items
-console.log(page.total);      // total count (when available)
+console.log(page.data); // current page items
+console.log(page.total); // total count (when available)
 console.log(page.pagination); // { hasMore: boolean, cursor: string | null }
 
 if (page.hasNextPage()) {
@@ -282,7 +286,7 @@ if (page.hasNextPage()) {
 All API errors extend `APIError` with `status`, `body`, and `headers` properties. Specific error classes are thrown based on HTTP status:
 
 | Status | Error class           |
-|--------|-----------------------|
+| ------ | --------------------- |
 | 400    | `BadRequestError`     |
 | 401    | `AuthenticationError` |
 | 403    | `PermissionError`     |
@@ -293,13 +297,13 @@ All API errors extend `APIError` with `status`, `body`, and `headers` properties
 Network failures throw `ConnectionError`, and timeouts throw `TimeoutError`.
 
 ```ts
-import { NotFoundError, RateLimitError, APIError } from '@air/api-sdk';
+import { NotFoundError, RateLimitError, APIError } from "@air/api-sdk";
 
 try {
-  await air.assets.get('non-existent-id');
+  await air.assets.get("non-existent-id");
 } catch (err) {
   if (err instanceof NotFoundError) {
-    console.log('Asset not found');
+    console.log("Asset not found");
   } else if (err instanceof RateLimitError) {
     console.log(`Rate limited, retry after ${err.retryAfter}s`);
   } else if (err instanceof APIError) {
@@ -355,11 +359,11 @@ npm run typecheck
 
 ### Packages
 
-| Package | Description |
-|---------|-------------|
+| Package         | Description                                  |
+| --------------- | -------------------------------------------- |
 | `@air/api-core` | HTTP client, pagination, errors, retry logic |
-| `@air/api-rest` | Resource classes and types |
-| `@air/api-sdk` | Unified entry point (re-exports core + rest) |
+| `@air/api-rest` | Resource classes and types                   |
+| `@air/api-sdk`  | Unified entry point (re-exports core + rest) |
 
 ## Requirements
 

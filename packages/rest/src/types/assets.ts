@@ -1,5 +1,5 @@
-import type { CursorPageParams } from '@air/api-core';
-import type { Tag } from './tags';
+import type { CursorPageParams } from "@air/api-core";
+import type { Tag } from "./tags";
 
 export interface SmartTag {
   name: string;
@@ -50,8 +50,8 @@ export interface AssetListParams extends CursorPageParams {
   tag?: string | string[];
   customField?: string | string[];
   search?: string;
-  'createdAt[gte]'?: string;
-  'createdAt[lte]'?: string;
+  "createdAt[gte]"?: string;
+  "createdAt[lte]"?: string;
 }
 
 export interface AssetVersionUpdateParams {

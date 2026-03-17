@@ -1,34 +1,36 @@
-import { describe, test, expect, afterAll } from 'vitest';
-import { getClient, resourceName } from './helpers/setup';
+import { describe, test, expect, afterAll } from "vitest";
+import { getClient, resourceName } from "./helpers/setup";
 
 const client = getClient();
 const cleanup: (() => Promise<void>)[] = [];
 
 afterAll(async () => {
   for (const fn of cleanup) {
-    try { await fn(); } catch {}
+    try {
+      await fn();
+    } catch {}
   }
 });
 
-describe('Custom Fields', () => {
-  test('list custom fields returns paginated response', async () => {
+describe("Custom Fields", () => {
+  test("list custom fields returns paginated response", async () => {
     const page = await client.customFields.list();
     expect(page.data).toBeInstanceOf(Array);
     expect(page.pagination).toBeDefined();
   });
 
-  test('create → get → update → delete lifecycle', async () => {
-    const name = resourceName('cf');
+  test("create → get → update → delete lifecycle", async () => {
+    const name = resourceName("cf");
     const cf = await client.customFields.create({
       name,
-      type: 'single-select',
-      values: [{ name: 'Option A' }],
+      type: "single-select",
+      values: [{ name: "Option A" }],
     });
     cleanup.push(() => client.customFields.delete(cf.id));
 
     expect(cf.id).toBeDefined();
     expect(cf.name).toBe(name);
-    expect(cf.type).toBe('single-select');
+    expect(cf.type).toBe("single-select");
     expect(cf.values).toBeInstanceOf(Array);
     expect(cf.values!.length).toBe(1);
 
@@ -47,25 +49,25 @@ describe('Custom Fields', () => {
     cleanup.length = 0;
   });
 
-  test('custom field value CRUD', async () => {
-    const name = resourceName('cf-values');
+  test("custom field value CRUD", async () => {
+    const name = resourceName("cf-values");
     const cf = await client.customFields.create({
       name,
-      type: 'single-select',
-      values: [{ name: 'Initial' }],
+      type: "single-select",
+      values: [{ name: "Initial" }],
     });
     cleanup.push(() => client.customFields.delete(cf.id));
 
     // Create value
-    const newValue = await client.customFields.createValue(cf.id, { name: 'New Option' });
+    const newValue = await client.customFields.createValue(cf.id, { name: "New Option" });
     expect(newValue.id).toBeDefined();
-    expect(newValue.name).toBe('New Option');
+    expect(newValue.name).toBe("New Option");
 
     // Update value
-    await client.customFields.updateValue(cf.id, newValue.id, { name: 'Renamed Option' });
+    await client.customFields.updateValue(cf.id, newValue.id, { name: "Renamed Option" });
     const refreshed = await client.customFields.get(cf.id);
     const updated = refreshed.values!.find((v) => v.id === newValue.id);
-    expect(updated?.name).toBe('Renamed Option');
+    expect(updated?.name).toBe("Renamed Option");
 
     // Delete value
     await client.customFields.deleteValue(cf.id, newValue.id);

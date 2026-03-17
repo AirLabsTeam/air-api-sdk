@@ -1,26 +1,28 @@
-import { describe, test, expect, afterAll } from 'vitest';
-import { NotFoundError } from '@air/api-sdk';
-import { getClient, resourceName } from './helpers/setup';
+import { describe, test, expect, afterAll } from "vitest";
+import { NotFoundError } from "@air/api-sdk";
+import { getClient, resourceName } from "./helpers/setup";
 
 const client = getClient();
 const cleanup: (() => Promise<void>)[] = [];
 
 afterAll(async () => {
   for (const fn of cleanup) {
-    try { await fn(); } catch {}
+    try {
+      await fn();
+    } catch {}
   }
 });
 
-describe('Tags', () => {
-  test('list tags returns paginated response', async () => {
+describe("Tags", () => {
+  test("list tags returns paginated response", async () => {
     const page = await client.tags.list();
     expect(page.data).toBeInstanceOf(Array);
     expect(page.pagination).toBeDefined();
-    expect(typeof page.pagination.hasMore).toBe('boolean');
+    expect(typeof page.pagination.hasMore).toBe("boolean");
   });
 
-  test('create → get → update → delete lifecycle', async () => {
-    const name = resourceName('tag');
+  test("create → get → update → delete lifecycle", async () => {
+    const name = resourceName("tag");
     const tag = await client.tags.create({ name });
     cleanup.push(() => client.tags.delete(tag.id));
 
@@ -45,7 +47,7 @@ describe('Tags', () => {
     // Verify gone
     try {
       await client.tags.get(tag.id);
-      throw new Error('Expected NotFoundError');
+      throw new Error("Expected NotFoundError");
     } catch (err) {
       expect(err).toBeInstanceOf(NotFoundError);
     }

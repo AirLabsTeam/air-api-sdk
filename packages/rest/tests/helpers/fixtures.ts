@@ -1,24 +1,24 @@
-import type { Asset, AssetVersion } from '../../src/types/assets';
-import type { Board } from '../../src/types/boards';
-import type { Tag } from '../../src/types/tags';
-import type { CustomField } from '../../src/types/custom-fields';
+import type { Asset, AssetVersion } from "../../src/types/assets";
+import type { Board } from "../../src/types/boards";
+import type { Tag } from "../../src/types/tags";
+import type { CustomField } from "../../src/types/custom-fields";
 
 export function makeTag(overrides: Partial<Tag> = {}): Tag {
   return {
-    id: 'tag-1',
-    name: 'Test Tag',
+    id: "tag-1",
+    name: "Test Tag",
     ...overrides,
   };
 }
 
 export function makeBoard(overrides: Partial<Board> = {}): Board {
   return {
-    id: 'board-1',
+    id: "board-1",
     parentBoardId: null,
-    title: 'Test Board',
+    title: "Test Board",
     description: null,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
     customFields: undefined,
     ...overrides,
   };
@@ -26,15 +26,15 @@ export function makeBoard(overrides: Partial<Board> = {}): Board {
 
 export function makeAssetVersion(overrides: Partial<AssetVersion> = {}): AssetVersion {
   return {
-    id: 'version-1',
-    fileName: 'test-file',
-    ext: 'png',
-    title: 'Test File',
+    id: "version-1",
+    fileName: "test-file",
+    ext: "png",
+    title: "Test File",
     description: null,
     summary: null,
-    type: 'image',
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    type: "image",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
     fileCreatedAt: null,
     width: 1920,
     height: 1080,
@@ -49,7 +49,7 @@ export function makeAssetVersion(overrides: Partial<AssetVersion> = {}): AssetVe
 
 export function makeAsset(overrides: Partial<Asset> = {}): Asset {
   return {
-    id: 'asset-1',
+    id: "asset-1",
     customFields: undefined,
     coverVersion: makeAssetVersion(),
     ...overrides,
@@ -58,13 +58,13 @@ export function makeAsset(overrides: Partial<Asset> = {}): Asset {
 
 export function makeCustomField(overrides: Partial<CustomField> = {}): CustomField {
   return {
-    id: 'cf-1',
-    name: 'Test Field',
+    id: "cf-1",
+    name: "Test Field",
     description: null,
-    type: 'plain-text',
+    type: "plain-text",
     values: null,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
     ...overrides,
   };
 }

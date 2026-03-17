@@ -1,9 +1,9 @@
-import { APIError, ConnectionError, TimeoutError } from './errors';
-import { CursorPage, PagePromise } from './pagination';
-import type { RequestOptions } from './request-options';
-import { retryWithBackoff } from './retry';
-import type { CursorPageResponse } from './types';
-import { VERSION } from './version';
+import { APIError, ConnectionError, TimeoutError } from "./errors";
+import { CursorPage, PagePromise } from "./pagination";
+import type { RequestOptions } from "./request-options";
+import { retryWithBackoff } from "./retry";
+import type { CursorPageResponse } from "./types";
+import { VERSION } from "./version";
 
 export interface AirBaseOptions {
   apiKey?: string;
@@ -28,23 +28,20 @@ export class AirBase {
     const apiKey = options.apiKey ?? process.env.AIR_API_KEY;
     if (!apiKey) {
       throw new Error(
-        'API key is required. Pass it as `apiKey` option or set the AIR_API_KEY environment variable.',
+        "API key is required. Pass it as `apiKey` option or set the AIR_API_KEY environment variable.",
       );
     }
 
     const workspaceId = options.workspaceId ?? process.env.AIR_WORKSPACE_ID;
     if (!workspaceId) {
       throw new Error(
-        'Workspace ID is required. Pass it as `workspaceId` option or set the AIR_WORKSPACE_ID environment variable.',
+        "Workspace ID is required. Pass it as `workspaceId` option or set the AIR_WORKSPACE_ID environment variable.",
       );
     }
 
     this.apiKey = apiKey;
     this.workspaceId = workspaceId;
-    this.baseURL = (options.baseURL ?? 'https://api.air.inc/v1').replace(
-      /\/$/,
-      '',
-    );
+    this.baseURL = (options.baseURL ?? "https://api.air.inc/v1").replace(/\/$/, "");
     this.maxRetries = options.maxRetries ?? 3;
     this.timeout = options.timeout ?? 60_000;
     this._fetch = options.fetch ?? globalThis.fetch;
@@ -56,10 +53,7 @@ export class AirBase {
   }
 
   async request<T>(options: RequestOptions): Promise<T> {
-    return retryWithBackoff(
-      () => this._executeRequest<T>(options),
-      this.maxRetries,
-    );
+    return retryWithBackoff(() => this._executeRequest<T>(options), this.maxRetries);
   }
 
   requestCursorPage<T>(
@@ -89,15 +83,15 @@ export class AirBase {
     const url = this._buildURL(options.path, options.query);
 
     const headers: Record<string, string> = {
-      'x-api-key': this.apiKey,
-      'x-air-workspace-id': this.workspaceId,
-      'user-agent': `air-api-sdk/${VERSION}`,
+      "x-api-key": this.apiKey,
+      "x-air-workspace-id": this.workspaceId,
+      "user-agent": `air-api-sdk/${VERSION}`,
       ...this._defaultHeaders,
       ...options.headers,
     };
 
     if (options.body !== undefined) {
-      headers['content-type'] = 'application/json';
+      headers["content-type"] = "application/json";
     }
 
     const timeout = options.timeout ?? this.timeout;
@@ -106,7 +100,7 @@ export class AirBase {
 
     // Combine with user-provided signal
     if (options.signal) {
-      options.signal.addEventListener('abort', () => controller.abort());
+      options.signal.addEventListener("abort", () => controller.abort());
     }
 
     let response: Response;
@@ -118,12 +112,10 @@ export class AirBase {
         signal: controller.signal,
       });
     } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
+      if (error instanceof DOMException && error.name === "AbortError") {
         throw new TimeoutError();
       }
-      throw new ConnectionError(
-        error instanceof Error ? error.message : 'Connection failed',
-      );
+      throw new ConnectionError(error instanceof Error ? error.message : "Connection failed");
     } finally {
       clearTimeout(timeoutId);
     }
@@ -137,8 +129,8 @@ export class AirBase {
       return undefined as T;
     }
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
       return undefined as T;
     }
 
