@@ -26,7 +26,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@air/api-core": "workspace:*"
+    "@air/api-core": "*"
   },
   "engines": {
     "node": ">=18"
