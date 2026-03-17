@@ -9,7 +9,7 @@
     "build": "npm run -w packages/core build && npm run -w packages/rest build && npm run -w packages/sdk build",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
-    "typecheck": "tsc -b",
+    "typecheck": "npm run -w packages/core typecheck && npm run -w packages/rest typecheck && npm run -w packages/sdk typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
