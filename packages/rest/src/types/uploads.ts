@@ -50,6 +50,19 @@ export interface CompleteMultipartParams {
   }[];
 }
 
+export type FileSource =
+  | { type: "path"; filePath: string }
+  | { type: "buffer"; data: Buffer }
+  | { type: "file"; file: File };
+
+export interface FileMeta {
+  source: FileSource;
+  fileName: string;
+  ext: string;
+  mime: string;
+  size: number;
+}
+
 export interface UploadFileParams {
   filePath?: string;
   buffer?: Buffer | ArrayBuffer;

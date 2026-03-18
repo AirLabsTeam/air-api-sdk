@@ -77,4 +77,31 @@ describe("Uploads", () => {
     // Clean up
     await client.assets.delete(result.assetId);
   });
+
+  test("high-level: uploadFile with filePath → delete asset", async () => {
+    const fs = await import("fs");
+    const os = await import("os");
+    const path = await import("path");
+
+    const tmpFile = path.join(os.tmpdir(), `air-e2e-${Date.now()}.png`);
+    fs.writeFileSync(tmpFile, TINY_PNG);
+
+    try {
+      const board = await findOrCreateBoard(client, "uploads-board");
+      const result = await client.uploads.uploadFile(
+        { filePath: tmpFile },
+        { parentBoardId: board.id },
+      );
+
+      expect(result.assetId).toBeDefined();
+      expect(result.versionId).toBeDefined();
+
+      const asset = await client.assets.get(result.assetId);
+      expect(asset.id).toBe(result.assetId);
+
+      await client.assets.delete(result.assetId);
+    } finally {
+      fs.unlinkSync(tmpFile);
+    }
+  });
 });
