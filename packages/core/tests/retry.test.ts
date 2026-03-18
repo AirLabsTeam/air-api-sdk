@@ -4,9 +4,11 @@ import {
   APIError,
   BadRequestError,
   AuthenticationError,
+  ConnectionError,
   NotFoundError,
   RateLimitError,
   InternalServerError,
+  TimeoutError,
 } from "../src/errors";
 
 describe("isRetryableError", () => {
@@ -40,8 +42,16 @@ describe("isRetryableError", () => {
     expect(isRetryableError(err)).toBe(false);
   });
 
-  test("retries on TypeError (network error)", () => {
-    expect(isRetryableError(new TypeError("fetch failed"))).toBe(true);
+  test("retries on ConnectionError", () => {
+    expect(isRetryableError(new ConnectionError("fetch failed"))).toBe(true);
+  });
+
+  test("retries on TimeoutError", () => {
+    expect(isRetryableError(new TimeoutError())).toBe(true);
+  });
+
+  test("does not retry on TypeError", () => {
+    expect(isRetryableError(new TypeError("fetch failed"))).toBe(false);
   });
 
   test("does not retry POST on 500", () => {
@@ -128,6 +138,32 @@ describe("retryWithBackoff", () => {
       expect(e).toBeInstanceOf(InternalServerError);
     }
     expect(calls).toBe(3); // initial + 2 retries
+  });
+
+  test("retries ConnectionError", async () => {
+    let calls = 0;
+    const result = await retryWithBackoff(async () => {
+      calls++;
+      if (calls < 3) {
+        throw new ConnectionError("fetch failed");
+      }
+      return "ok";
+    }, 3);
+    expect(result).toBe("ok");
+    expect(calls).toBe(3);
+  });
+
+  test("retries TimeoutError", async () => {
+    let calls = 0;
+    const result = await retryWithBackoff(async () => {
+      calls++;
+      if (calls < 2) {
+        throw new TimeoutError();
+      }
+      return "ok";
+    }, 3);
+    expect(result).toBe("ok");
+    expect(calls).toBe(2);
   });
 
   test("does not retry POST on 5xx errors", async () => {
