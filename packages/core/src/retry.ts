@@ -1,4 +1,4 @@
-import { APIError, RateLimitError } from "./errors";
+import { APIError, ConnectionError, RateLimitError } from "./errors";
 
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504]);
 const SERVER_ERROR_CODES = new Set([500, 502, 503, 504]);
@@ -11,7 +11,7 @@ export function isRetryableError(error: unknown, method?: string): boolean {
     return RETRYABLE_STATUS_CODES.has(error.status);
   }
   // Retry on network errors (fetch failures)
-  if (error instanceof TypeError) {
+  if (error instanceof ConnectionError) {
     return true;
   }
   return false;
