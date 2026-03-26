@@ -26,15 +26,19 @@ export class Assets {
     if (params.includeNestedAssets !== undefined) {
       query.includeNestedAssets = params.includeNestedAssets;
     }
+
     if (params.tag) {
       query.tag = params.tag;
     }
+
     if (params.customField) {
       query.customField = params.customField;
     }
+
     if (params["createdAt[gte]"]) {
       query["createdAt[gte]"] = params["createdAt[gte]"];
     }
+
     if (params["createdAt[lte]"]) {
       query["createdAt[lte]"] = params["createdAt[lte]"];
     }
