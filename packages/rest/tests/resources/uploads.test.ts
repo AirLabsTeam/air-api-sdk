@@ -144,7 +144,10 @@ describe("Uploads", () => {
     const progressEvents: { percentage: number; uploadedBytes: number }[] = [];
     const result = await client.uploads.uploadFile(
       { buffer, fileName: "big", ext: "bin" },
-      { onProgress: (p) => progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }) },
+      {
+        onProgress: (p) =>
+          progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }),
+      },
     );
 
     expect(result.assetId).toBe("asset-1");
@@ -205,12 +208,15 @@ describe("Uploads - filePath streaming", () => {
     const client = new AirApi(createClientOptions(mockFetch));
 
     // Replace the uploads instance with one using re-imported module
-    const uploads = new Uploads(client as any);
+    const uploads = new Uploads(client);
 
     const progressEvents: { percentage: number; uploadedBytes: number }[] = [];
     const result = await uploads.uploadFile(
       { filePath: "/tmp/large-video.mp4" },
-      { onProgress: (p) => progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }) },
+      {
+        onProgress: (p) =>
+          progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }),
+      },
     );
 
     expect(result.assetId).toBe("asset-1");
@@ -235,11 +241,11 @@ describe("Uploads - filePath streaming", () => {
     expect(mockCloseSync).toHaveBeenCalledWith(42);
 
     // Verify uploaded chunk bodies have correct sizes
-    const putCalls = mockFetch.calls.filter((c: any) => c.init?.method === "PUT");
+    const putCalls = mockFetch.calls.filter((c) => c.init?.method === "PUT");
     expect(putCalls).toHaveLength(3);
-    expect(putCalls[0].init.body.length).toBe(partSize);
-    expect(putCalls[1].init.body.length).toBe(partSize);
-    expect(putCalls[2].init.body.length).toBe(totalSize - 2 * partSize);
+    expect((putCalls[0].init!.body as Buffer).length).toBe(partSize);
+    expect((putCalls[1].init!.body as Buffer).length).toBe(partSize);
+    expect((putCalls[2].init!.body as Buffer).length).toBe(totalSize - 2 * partSize);
 
     // Verify progress events
     expect(progressEvents).toHaveLength(3);
@@ -289,18 +295,21 @@ describe("Uploads - filePath streaming", () => {
       { status: 204 },
     ]);
     const client = new AirApi(createClientOptions(mockFetch));
-    const uploads = new Uploads(client as any);
+    const uploads = new Uploads(client);
 
     const progressEvents: { percentage: number; uploadedBytes: number }[] = [];
     await uploads.uploadFile(
       { filePath: "/tmp/short-read.mp4" },
-      { onProgress: (p) => progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }) },
+      {
+        onProgress: (p) =>
+          progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }),
+      },
     );
 
     // Verify the uploaded body was trimmed to bytesRead
-    const putCalls = mockFetch.calls.filter((c: any) => c.init?.method === "PUT");
+    const putCalls = mockFetch.calls.filter((c) => c.init?.method === "PUT");
     expect(putCalls).toHaveLength(1);
-    expect(putCalls[0].init.body.length).toBe(shortBytes);
+    expect((putCalls[0].init!.body as Buffer).length).toBe(shortBytes);
 
     // Progress should reflect actual bytes read
     expect(progressEvents).toHaveLength(1);
