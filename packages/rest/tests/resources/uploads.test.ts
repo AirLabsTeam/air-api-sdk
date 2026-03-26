@@ -168,7 +168,7 @@ describe("Uploads - filePath streaming", () => {
 
     const mockStatSync = vi.fn().mockReturnValue({ size: totalSize });
     const mockOpenSync = vi.fn().mockReturnValue(42);
-    const mockReadSync = vi.fn().mockReturnValue(0);
+    const mockReadSync = vi.fn().mockImplementation((_fd, _buf, _offset, length) => length);
     const mockCloseSync = vi.fn();
 
     // Use vi.doMock for dynamic import mocking
@@ -234,6 +234,13 @@ describe("Uploads - filePath streaming", () => {
 
     expect(mockCloseSync).toHaveBeenCalledWith(42);
 
+    // Verify uploaded chunk bodies have correct sizes
+    const putCalls = mockFetch.calls.filter((c: any) => c.init?.method === "PUT");
+    expect(putCalls).toHaveLength(3);
+    expect(putCalls[0].init.body.length).toBe(partSize);
+    expect(putCalls[1].init.body.length).toBe(partSize);
+    expect(putCalls[2].init.body.length).toBe(totalSize - 2 * partSize);
+
     // Verify progress events
     expect(progressEvents).toHaveLength(3);
     expect(progressEvents[0].percentage).toBe(40);
@@ -243,6 +250,61 @@ describe("Uploads - filePath streaming", () => {
     // Verify completeMultipart was called
     const lastCall = mockFetch.calls[mockFetch.calls.length - 1];
     expect(lastCall.url).toContain("/uploads/completeMultipart");
+
+    vi.doUnmock("fs");
+  });
+
+  test("short read produces a trimmed chunk via subarray", async () => {
+    const totalSize = 100 * 1024 * 1024; // exactly 1 part
+    const shortBytes = 80 * 1024 * 1024; // simulate short read
+
+    const mockStatSync = vi.fn().mockReturnValue({ size: totalSize });
+    const mockOpenSync = vi.fn().mockReturnValue(42);
+    const mockReadSync = vi.fn().mockImplementation((_fd, _buf, _offset, _length) => shortBytes);
+    const mockCloseSync = vi.fn();
+
+    vi.doMock("fs", () => ({
+      statSync: mockStatSync,
+      openSync: mockOpenSync,
+      readSync: mockReadSync,
+      closeSync: mockCloseSync,
+      readFileSync: vi.fn(),
+    }));
+
+    const { Uploads } = await import("../../src/resources/uploads");
+
+    const createResponse = {
+      assetId: "asset-1",
+      versionId: "v1",
+      multiPartUploadId: "mp-1",
+      key: "key-1",
+    };
+
+    const partUrlResponse = { url: "https://s3.example.com/part" };
+
+    const mockFetch = createMockFetch([
+      { status: 201, body: createResponse },
+      { body: partUrlResponse },
+      { status: 200, headers: { etag: '"etag1"' } },
+      { status: 204 },
+    ]);
+    const client = new AirApi(createClientOptions(mockFetch));
+    const uploads = new Uploads(client as any);
+
+    const progressEvents: { percentage: number; uploadedBytes: number }[] = [];
+    await uploads.uploadFile(
+      { filePath: "/tmp/short-read.mp4" },
+      { onProgress: (p) => progressEvents.push({ percentage: p.percentage, uploadedBytes: p.uploadedBytes }) },
+    );
+
+    // Verify the uploaded body was trimmed to bytesRead
+    const putCalls = mockFetch.calls.filter((c: any) => c.init?.method === "PUT");
+    expect(putCalls).toHaveLength(1);
+    expect(putCalls[0].init.body.length).toBe(shortBytes);
+
+    // Progress should reflect actual bytes read
+    expect(progressEvents).toHaveLength(1);
+    expect(progressEvents[0].uploadedBytes).toBe(shortBytes);
 
     vi.doUnmock("fs");
   });

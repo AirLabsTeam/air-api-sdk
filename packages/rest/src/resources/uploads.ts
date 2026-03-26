@@ -113,11 +113,12 @@ export class Uploads {
           const end = Math.min(start + DEFAULT_PART_SIZE, totalSize);
           const length = end - start;
           const chunk = Buffer.alloc(length);
-          fs.readSync(fd, chunk, 0, length, start);
+          const bytesRead = fs.readSync(fd, chunk, 0, length, start);
+          const body = bytesRead < length ? chunk.subarray(0, bytesRead) : chunk;
 
           const { url } = await this.getPartUploadUrl({ multiPartUploadId, key, partNumber });
 
-          const response = await fetchFn(url, { method: "PUT", body: chunk });
+          const response = await fetchFn(url, { method: "PUT", body });
 
           if (!response.ok) {
             throw new Error(`Part ${partNumber} upload failed with status ${response.status}`);
@@ -129,7 +130,7 @@ export class Uploads {
           }
 
           parts.push({ etag, partNumber });
-          uploadedBytes += length;
+          uploadedBytes += bytesRead;
 
           if (onProgress) {
             onProgress({
