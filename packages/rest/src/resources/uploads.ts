@@ -13,7 +13,6 @@ import type {
   UploadFileResponse,
 } from "../types/uploads";
 
-const _MULTIPART_THRESHOLD = 5e9; // 5GB
 const DEFAULT_PART_SIZE = 100 * 1024 * 1024; // 100MB
 
 export class Uploads {
