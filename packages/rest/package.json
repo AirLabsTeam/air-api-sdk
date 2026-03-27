@@ -22,19 +22,25 @@
     "dist"
   ],
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "tsup",
     "test": "vitest run",
     "typecheck": "tsc -b",
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@air/api-core": "*"
+    "@air/api-core": "0.1.0"
   },
   "engines": {
     "node": ">=18"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AirLabsTeam/air-api-sdk.git",
+    "directory": "packages/rest"
   },
   "license": "UNLICENSED"
 }
