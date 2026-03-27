@@ -379,11 +379,11 @@ Merge the "chore: version packages" PR. CI will publish the new versions to npm 
 
 ### Scripts
 
-| Script | Description |
-| --- | --- |
-| `npm run changeset:add` | Add a new changeset (interactive) |
-| `npm run version` | Apply changesets — bump versions and update changelogs (CI does this) |
-| `npm run release` | Publish packages to npm (CI does this) |
+| Script                  | Description                                                           |
+| ----------------------- | --------------------------------------------------------------------- |
+| `npm run changeset:add` | Add a new changeset (interactive)                                     |
+| `npm run version`       | Apply changesets — bump versions and update changelogs (CI does this) |
+| `npm run release`       | Publish packages to npm (CI does this)                                |
 
 ## Requirements
 
