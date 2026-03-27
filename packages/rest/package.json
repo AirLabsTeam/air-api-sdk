@@ -1,6 +1,6 @@
 {
   "name": "@air/api-rest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Typed REST client for Air API",
   "main": "./dist/index.cjs",
@@ -29,7 +29,7 @@
     "clean": "rm -rf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@air/api-core": "0.1.1"
+    "@air/api-core": "0.1.2"
   },
   "engines": {
     "node": ">=18"
