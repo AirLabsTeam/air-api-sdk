@@ -355,6 +355,36 @@ npm run typecheck
 | `@air/api-rest` | Resource classes and types                   |
 | `@air/api-sdk`  | Unified entry point (re-exports core + rest) |
 
+## Releasing
+
+This project uses [Changesets](https://github.com/changesets/changesets) to manage versioning and publishing.
+
+### 1. Add a changeset
+
+When you make a change that should be published, add a changeset describing it:
+
+```bash
+npm run changeset:add
+```
+
+This launches an interactive prompt where you select the affected packages and bump type (`patch`, `minor`, or `major`), then write a short summary. It creates a markdown file in `.changeset/` — commit this with your PR.
+
+### 2. Merge to main
+
+When your PR (with the changeset file) merges to `main`, the CI workflow automatically creates or updates a **"chore: version packages"** PR that bumps versions and updates changelogs.
+
+### 3. Publish
+
+Merge the "chore: version packages" PR. CI will publish the new versions to npm and create GitHub releases.
+
+### Scripts
+
+| Script                  | Description                                                           |
+| ----------------------- | --------------------------------------------------------------------- |
+| `npm run changeset:add` | Add a new changeset (interactive)                                     |
+| `npm run version`       | Apply changesets — bump versions and update changelogs (CI does this) |
+| `npm run release`       | Publish packages to npm (CI does this)                                |
+
 ## Requirements
 
 - Node.js >= 18
