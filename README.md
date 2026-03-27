@@ -1,6 +1,6 @@
 # Air API SDK
 
-Typed JavaScript/TypeScript SDK for the [Air](https://air.inc) API.
+Typed JavaScript/TypeScript SDK for the [Air](https://air.inc) API. See the [developer docs](https://developer.air.inc/) for API reference and guides.
 
 ## Installation
 

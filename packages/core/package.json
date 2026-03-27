@@ -39,5 +39,5 @@
     "url": "https://github.com/AirLabsTeam/air-api-sdk.git",
     "directory": "packages/core"
   },
-  "license": "UNLICENSED"
+  "license": "MIT"
 }
