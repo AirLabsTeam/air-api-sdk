@@ -14,9 +14,14 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "clean": "npm run --workspaces --if-present clean"
+    "clean": "npm run --workspaces --if-present clean",
+    "changeset": "changeset",
+    "changeset:add": "changeset add",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^20.0.0",
     "dotenv": "^17.0.0",
