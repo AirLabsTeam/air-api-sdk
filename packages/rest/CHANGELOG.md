@@ -1,5 +1,11 @@
 # @air/api-rest
 
+## 0.1.3
+
+### Patch Changes
+
+- 9281049: Handle short reads from fs.readSync in streaming uploads
+
 ## 0.1.2
 
 ### Patch Changes
