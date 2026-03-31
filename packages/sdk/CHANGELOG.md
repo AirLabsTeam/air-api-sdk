@@ -1,5 +1,12 @@
 # @air/api-sdk
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [9281049]
+  - @air/api-rest@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

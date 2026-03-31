@@ -1,6 +1,6 @@
 {
   "name": "@air/api-sdk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Air API SDK - complete SDK for the Air.inc API",
   "main": "./dist/index.cjs",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@air/api-core": "0.1.2",
-    "@air/api-rest": "0.1.2"
+    "@air/api-rest": "0.1.3"
   },
   "engines": {
     "node": ">=18"
