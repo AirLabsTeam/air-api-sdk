@@ -6,15 +6,15 @@ This is a **library/SDK monorepo** (npm workspaces) — there are no servers, da
 
 ### Quick reference
 
-| Action | Command |
-|--------|---------|
-| Install deps | `npm install` |
-| Build all packages | `npm run build` (must run in dependency order: core → rest → sdk) |
-| Unit tests | `npm test` (uses vitest with mock fetch — fully offline, no credentials needed) |
-| E2E tests | `npm run test:e2e` (requires `AIR_API_KEY` + `AIR_WORKSPACE_ID` in `.env.test`) |
-| Lint | `npm run lint` |
-| Typecheck | `npm run typecheck` |
-| Format check | `npm run format:check` |
+| Action             | Command                                                                         |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Install deps       | `npm install`                                                                   |
+| Build all packages | `npm run build` (must run in dependency order: core → rest → sdk)               |
+| Unit tests         | `npm test` (uses vitest with mock fetch — fully offline, no credentials needed) |
+| E2E tests          | `npm run test:e2e` (requires `AIR_API_KEY` + `AIR_WORKSPACE_ID` in `.env.test`) |
+| Lint               | `npm run lint`                                                                  |
+| Typecheck          | `npm run typecheck`                                                             |
+| Format check       | `npm run format:check`                                                          |
 
 ### Non-obvious notes
 
