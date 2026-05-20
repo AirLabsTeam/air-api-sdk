@@ -18,6 +18,7 @@
     { "path": "packages/core" },
     { "path": "packages/rest" },
     { "path": "packages/sdk" },
-    { "path": "packages/webhooks" }
+    { "path": "packages/webhooks" },
+    { "path": "packages/mcp" }
   ]
 }

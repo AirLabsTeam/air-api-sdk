@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run -w packages/core build && npm run -w packages/rest build && npm run -w packages/sdk build",
+    "build": "npm run -w packages/core build && npm run -w packages/rest build && npm run -w packages/sdk build && npm run -w packages/mcp build",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "typecheck": "tsc -b",

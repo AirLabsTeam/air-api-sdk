@@ -1,0 +1,57 @@
+{
+  "name": "@air/mcp",
+  "version": "0.1.13",
+  "description": "MCP server for the Air.inc platform",
+  "type": "module",
+  "bin": {
+    "air-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "mcpmon -w src -e ts -- tsx src/dev.ts",
+    "dev:http": "mcpmon -w src -e ts -- tsx src/dev.ts -- --http --debug",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run test/unit",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@air/api-rest": "0.1.3",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.3.1",
+    "@types/node": "^25.5.0",
+    "mcpmon": "^1.0.1",
+    "tsup": "^8.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AirLabsTeam/air-api-sdk.git",
+    "directory": "packages/mcp"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

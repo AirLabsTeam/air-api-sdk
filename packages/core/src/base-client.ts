@@ -17,6 +17,7 @@ export interface AirBaseOptions {
 
 export class AirBase {
   readonly apiKey: string;
+  /** Empty when unset; required on each request unless overridden per-request. */
   workspaceId: string;
   readonly baseURL: string;
   readonly maxRetries: number;
@@ -33,14 +34,9 @@ export class AirBase {
     }
 
     const workspaceId = options.workspaceId ?? process.env.AIR_WORKSPACE_ID;
-    if (!workspaceId) {
-      throw new Error(
-        "Workspace ID is required. Pass it as `workspaceId` option or set the AIR_WORKSPACE_ID environment variable.",
-      );
-    }
 
     this.apiKey = apiKey;
-    this.workspaceId = workspaceId;
+    this.workspaceId = workspaceId ?? "";
     this.baseURL = (options.baseURL ?? "https://api.air.inc/v1").replace(/\/$/, "");
     this.maxRetries = options.maxRetries ?? 3;
     this.timeout = options.timeout ?? 60_000;
@@ -86,9 +82,16 @@ export class AirBase {
   private async _executeRequest<T>(options: RequestOptions): Promise<T> {
     const url = this._buildURL(options.path, options.query);
 
+    const workspaceId = options.workspaceId ?? this.workspaceId;
+    if (!workspaceId) {
+      throw new Error(
+        "Workspace ID is required. Pass it as `workspaceId` on the client, per-request in context, or set the AIR_WORKSPACE_ID environment variable.",
+      );
+    }
+
     const headers: Record<string, string> = {
       "x-api-key": this.apiKey,
-      "x-air-workspace-id": options.workspaceId ?? this.workspaceId,
+      "x-air-workspace-id": workspaceId,
       "user-agent": `air-api-sdk/${VERSION}`,
       ...this._defaultHeaders,
       ...options.headers,
