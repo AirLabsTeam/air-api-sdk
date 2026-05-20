@@ -3,15 +3,14 @@ import type { AirApi } from "@air/api-rest";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { WorkspaceSession } from "../workspace.js";
 import { handleToolError } from "../utils/errors.js";
-import { z as z4 } from "zod";
 export function registerCustomFieldTools(server: McpServer, client: AirApi, session: WorkspaceSession) {
   server.registerTool(
     "list_custom_fields",
     {
       description: "List custom fields defined in the workspace",
       inputSchema: {
-        limit: z4.number().optional().describe("Max results per page"),
-        cursor: z4.string().optional().describe("Pagination cursor")
+        limit: z.number().optional().describe("Max results per page"),
+        cursor: z.string().optional().describe("Pagination cursor")
       }
     },
     async ({ limit, cursor }) => {
@@ -39,7 +38,7 @@ export function registerCustomFieldTools(server: McpServer, client: AirApi, sess
     {
       description: "Get detailed information about a specific custom field, including its type and possible values",
       inputSchema: {
-        customFieldId: z4.string().describe("The custom field ID")
+        customFieldId: z.string().describe("The custom field ID")
       }
     },
     async ({ customFieldId }) => {

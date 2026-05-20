@@ -1,7 +1,7 @@
 import type { AirApi } from "@air/api-rest";
 import type { WorkspaceSession } from "../workspace.js";
 
-var APP_BASE_URL = "https://app.air.inc";
+const APP_BASE_URL = "https://app.air.inc";
 function sanitizeStringForUrl(str) {
   return str.replace(/[^a-zA-Z0-9 ]/g, " ").trim().replace(/[ ]+/g, "-").toLowerCase();
 }

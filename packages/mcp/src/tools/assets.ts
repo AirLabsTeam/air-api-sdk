@@ -3,8 +3,8 @@ import type { AirApi } from "@air/api-rest";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { WorkspaceSession } from "../workspace.js";
 import { handleToolError } from "../utils/errors.js";
-import { buildAssetUrl, getAssetUrl } from "../utils/urls.js";
-var IMGIX_PARAMS = {
+import { getAssetUrl } from "../utils/urls.js";
+const IMGIX_PARAMS = {
   thumbnail: "w=200&auto=compress,format",
   preview: "w=800&auto=compress,format"
 };
