@@ -11,8 +11,8 @@ export function registerTagTools(server: McpServer, client: AirApi, session: Wor
       inputSchema: {
         name: z.string().optional().describe("Filter tags by name"),
         limit: z.number().optional().describe("Max results per page"),
-        cursor: z.string().optional().describe("Pagination cursor")
-      }
+        cursor: z.string().optional().describe("Pagination cursor"),
+      },
     },
     async ({ name, limit, cursor }) => {
       try {
@@ -24,33 +24,33 @@ export function registerTagTools(server: McpServer, client: AirApi, session: Wor
               text: JSON.stringify(
                 { data: page.data, pagination: page.pagination, total: page.total },
                 null,
-                2
-              )
-            }
-          ]
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return handleToolError(error);
       }
-    }
+    },
   );
   server.registerTool(
     "create_tag",
     {
       description: "Create a new tag in the workspace",
       inputSchema: {
-        name: z.string().describe("The tag name")
-      }
+        name: z.string().describe("The tag name"),
+      },
     },
     async ({ name }) => {
       try {
         const tag = await client.tags.create({ name }, session.context());
         return {
-          content: [{ type: "text", text: JSON.stringify(tag, null, 2) }]
+          content: [{ type: "text", text: JSON.stringify(tag, null, 2) }],
         };
       } catch (error) {
         return handleToolError(error);
       }
-    }
+    },
   );
 }

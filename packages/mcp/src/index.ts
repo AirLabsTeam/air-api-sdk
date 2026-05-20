@@ -5,11 +5,7 @@ import { createServer as createHttpServer } from "http";
 import { randomUUID } from "crypto";
 import { AirApi } from "@air/api-rest";
 import { createServer } from "./server.js";
-import {
-  loadProjectEnv,
-  resolveWorkspaceId,
-  WorkspaceSession,
-} from "./workspace.js";
+import { loadProjectEnv, resolveWorkspaceId, WorkspaceSession } from "./workspace.js";
 
 const [major] = process.versions.node.split(".").map(Number);
 if (major < 18) {

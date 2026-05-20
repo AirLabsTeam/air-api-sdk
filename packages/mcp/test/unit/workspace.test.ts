@@ -11,9 +11,7 @@ import {
 
 describe("resolveWorkspaceId", () => {
   test("returns AIR_WORKSPACE_ID when set", () => {
-    expect(resolveWorkspaceId({ AIR_WORKSPACE_ID: "ws-123" } as NodeJS.ProcessEnv)).toBe(
-      "ws-123",
-    );
+    expect(resolveWorkspaceId({ AIR_WORKSPACE_ID: "ws-123" } as NodeJS.ProcessEnv)).toBe("ws-123");
   });
 
   test("returns undefined when unset", () => {
