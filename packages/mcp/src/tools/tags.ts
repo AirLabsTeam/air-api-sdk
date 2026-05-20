@@ -14,7 +14,7 @@ export function registerTagTools(server: McpServer, client: AirApi, session: Wor
         cursor: z.string().optional().describe("Pagination cursor"),
       },
     },
-    async ({ name, limit, cursor }) => {
+    async ({ name, limit, cursor }, _extra) => {
       try {
         const page = await client.tags.list({ name, limit, cursor }, session.context());
         return {
@@ -42,7 +42,7 @@ export function registerTagTools(server: McpServer, client: AirApi, session: Wor
         name: z.string().describe("The tag name"),
       },
     },
-    async ({ name }) => {
+    async ({ name }, _extra) => {
       try {
         const tag = await client.tags.create({ name }, session.context());
         return {

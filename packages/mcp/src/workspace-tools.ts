@@ -11,7 +11,7 @@ export function registerWorkspaceTools(server: McpServer, session: WorkspaceSess
         "Return the active Air workspace ID for this MCP session. The workspace may come from AIR_WORKSPACE_ID (env or project .env) or from set_workspace.",
       inputSchema: {},
     },
-    async () => {
+    async (_args, _extra) => {
       try {
         const workspaceId = session.requireWorkspaceId();
         return {
@@ -43,7 +43,7 @@ export function registerWorkspaceTools(server: McpServer, session: WorkspaceSess
         workspaceId: z.string().describe("The Air workspace ID (UUID)"),
       },
     },
-    async ({ workspaceId }) => {
+    async ({ workspaceId }, _extra) => {
       session.setActiveWorkspaceId(workspaceId);
       return {
         content: [

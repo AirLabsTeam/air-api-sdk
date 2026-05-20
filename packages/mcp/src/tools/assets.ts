@@ -2,13 +2,16 @@ import { z } from "zod";
 import type { AirApi } from "@air/api-rest";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { WorkspaceSession } from "../workspace.js";
+import {
+  IMGIX_PARAMS,
+  mimeTypeFromImageUrl,
+  type ImgixSize,
+  type ToolContentBlock,
+} from "../types.js";
 import { handleToolError } from "../utils/errors.js";
 import { getAssetUrl } from "../utils/urls.js";
-const IMGIX_PARAMS = {
-  thumbnail: "w=200&auto=compress,format",
-  preview: "w=800&auto=compress,format",
-};
-function isAllowedImageUrl(url) {
+
+function isAllowedImageUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     return (
@@ -19,15 +22,22 @@ function isAllowedImageUrl(url) {
     return false;
   }
 }
-function withImgixResize(url, size) {
+
+function withImgixResize(url: string, size: ImgixSize): string {
   const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}${IMGIX_PARAMS[size]}`;
 }
-async function fetchThumbnail(client: AirApi, session: WorkspaceSession, assetId, size) {
+
+async function fetchThumbnail(
+  client: AirApi,
+  session: WorkspaceSession,
+  assetId: string,
+  size?: ImgixSize,
+): Promise<{ assetId: string; data: string; mimeType: string } | null> {
   try {
     const asset = await client.assets.get(assetId, session.context());
     const urls = asset.coverVersion?.urls;
-    const resolvedSize = size ?? "thumbnail";
+    const resolvedSize: ImgixSize = size ?? "thumbnail";
     const preferred = resolvedSize === "preview" ? "preview" : "thumbnail";
     const fallback = preferred === "thumbnail" ? "preview" : "thumbnail";
     const rawUrl = urls?.[preferred] ?? urls?.[fallback];
@@ -36,20 +46,7 @@ async function fetchThumbnail(client: AirApi, session: WorkspaceSession, assetId
     if (!isAllowedImageUrl(imageUrl)) return null;
     const response = await fetch(imageUrl);
     if (!response.ok) return null;
-    const contentType = response.headers.get("content-type");
-    let mimeType = contentType?.split(";")[0]?.trim() ?? "image/jpeg";
-    if (!mimeType.startsWith("image/")) {
-      const ext = imageUrl.split(".").pop()?.split("?")[0]?.toLowerCase();
-      const extMap = {
-        png: "image/png",
-        jpg: "image/jpeg",
-        jpeg: "image/jpeg",
-        gif: "image/gif",
-        webp: "image/webp",
-        svg: "image/svg+xml",
-      };
-      mimeType = extMap[ext ?? ""] ?? "image/jpeg";
-    }
+    const mimeType = mimeTypeFromImageUrl(imageUrl, response.headers.get("content-type"));
     const arrayBuffer = await response.arrayBuffer();
     const data = Buffer.from(arrayBuffer).toString("base64");
     return { assetId, data, mimeType };
@@ -89,16 +86,19 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
           ),
       },
     },
-    async ({
-      parentBoardId,
-      includeNestedAssets,
-      tag,
-      customField,
-      search,
-      limit,
-      cursor,
-      includeThumbnails,
-    }) => {
+    async (
+      {
+        parentBoardId,
+        includeNestedAssets,
+        tag,
+        customField,
+        search,
+        limit,
+        cursor,
+        includeThumbnails,
+      },
+      _extra,
+    ) => {
       try {
         const page = await client.assets.list(
           {
@@ -112,7 +112,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
           },
           session.context(),
         );
-        const content = [
+        const content: ToolContentBlock[] = [
           {
             type: "text",
             text: JSON.stringify(
@@ -161,7 +161,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
           ),
       },
     },
-    async ({ boardId, limit, cursor, includeThumbnails }) => {
+    async ({ boardId, limit, cursor, includeThumbnails }, _extra) => {
       try {
         const page = await client.assets.list(
           {
@@ -172,7 +172,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
           },
           session.context(),
         );
-        const content = [
+        const content: ToolContentBlock[] = [
           {
             type: "text",
             text: JSON.stringify(
@@ -211,7 +211,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         assetId: z.string().describe("The asset ID"),
       },
     },
-    async ({ assetId }) => {
+    async ({ assetId }, _extra) => {
       try {
         const asset = await client.assets.get(assetId, session.context());
         const url = await getAssetUrl(client, session, asset.id, asset.coverVersion.id);
@@ -233,7 +233,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         versionId: z.string().optional().describe("The version ID (defaults to cover version)"),
       },
     },
-    async ({ assetId, versionId }) => {
+    async ({ assetId, versionId }, _extra) => {
       try {
         if (!versionId) {
           const asset = await client.assets.get(assetId, session.context());
@@ -262,7 +262,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         cursor: z.string().optional().describe("Pagination cursor"),
       },
     },
-    async ({ assetId, limit, cursor }) => {
+    async ({ assetId, limit, cursor }, _extra) => {
       try {
         const page = await client.assets.listBoards(assetId, { limit, cursor }, session.context());
         return {
@@ -293,7 +293,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         versionId: z.string().optional().describe("The version ID (defaults to cover version)"),
       },
     },
-    async ({ assetId, title, versionId }) => {
+    async ({ assetId, title, versionId }, _extra) => {
       try {
         if (!versionId) {
           const asset = await client.assets.get(assetId, session.context());
@@ -320,7 +320,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         versionId: z.string().optional().describe("Version ID (defaults to cover version)"),
       },
     },
-    async ({ assetId, title, description, versionId }) => {
+    async ({ assetId, title, description, versionId }, _extra) => {
       try {
         if (!versionId) {
           const asset = await client.assets.get(assetId, session.context());
@@ -351,7 +351,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         versionId: z.string().optional().describe("The version ID (defaults to cover version)"),
       },
     },
-    async ({ assetId, tagId, versionId }) => {
+    async ({ assetId, tagId, versionId }, _extra) => {
       try {
         if (!versionId) {
           const asset = await client.assets.get(assetId, session.context());
@@ -377,7 +377,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         versionId: z.string().optional().describe("The version ID (defaults to cover version)"),
       },
     },
-    async ({ assetId, tagId, versionId }) => {
+    async ({ assetId, tagId, versionId }, _extra) => {
       try {
         if (!versionId) {
           const asset = await client.assets.get(assetId, session.context());
@@ -407,7 +407,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
           ),
       },
     },
-    async ({ assetId, size }) => {
+    async ({ assetId, size }, _extra) => {
       try {
         const asset = await client.assets.get(assetId, session.context());
         const urls = asset.coverVersion?.urls;
@@ -415,7 +415,7 @@ export function registerAssetTools(server: McpServer, client: AirApi, session: W
         const preferred = resolvedSize === "preview" ? "preview" : "thumbnail";
         const fallback = preferred === "thumbnail" ? "preview" : "thumbnail";
         const rawUrl = urls?.[preferred] ?? urls?.[fallback] ?? null;
-        const imageUrl = rawUrl ? withImgixResize(rawUrl, resolvedSize) : null;
+        const imageUrl = rawUrl ? withImgixResize(rawUrl, resolvedSize as ImgixSize) : null;
         const metadata = `Asset: ${asset.coverVersion?.title ?? asset.id} (${asset.id})`;
         if (!imageUrl) {
           return {
@@ -452,20 +452,7 @@ Failed to fetch image: HTTP ${response.status}`,
               ],
             };
           }
-          const contentType = response.headers.get("content-type");
-          let mimeType = contentType?.split(";")[0]?.trim() ?? "image/jpeg";
-          if (!mimeType.startsWith("image/")) {
-            const ext = imageUrl.split(".").pop()?.split("?")[0]?.toLowerCase();
-            const extMap = {
-              png: "image/png",
-              jpg: "image/jpeg",
-              jpeg: "image/jpeg",
-              gif: "image/gif",
-              webp: "image/webp",
-              svg: "image/svg+xml",
-            };
-            mimeType = extMap[ext ?? ""] ?? "image/jpeg";
-          }
+          const mimeType = mimeTypeFromImageUrl(imageUrl, response.headers.get("content-type"));
           const arrayBuffer = await response.arrayBuffer();
           const data = Buffer.from(arrayBuffer).toString("base64");
           return {
@@ -526,7 +513,7 @@ Failed to fetch image: ${fetchError instanceof Error ? fetchError.message : Stri
         ),
       },
     },
-    async ({ assetId, customFieldId, value, values }) => {
+    async ({ assetId, customFieldId, value, values }, _extra) => {
       try {
         if (value !== void 0 && values !== void 0) {
           return {

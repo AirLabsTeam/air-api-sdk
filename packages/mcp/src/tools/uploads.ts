@@ -38,7 +38,7 @@ export function registerUploadTools(server: McpServer, client: AirApi, session: 
           .describe("Tags to apply to the asset"),
       },
     },
-    async ({ filePath, parentBoardId, assetId, customFields, tags }) => {
+    async ({ filePath, parentBoardId, assetId, customFields, tags }, _extra) => {
       try {
         const result = await client.uploads.uploadFile(
           { filePath },

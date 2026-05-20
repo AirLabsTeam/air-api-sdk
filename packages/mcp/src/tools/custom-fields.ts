@@ -17,7 +17,7 @@ export function registerCustomFieldTools(
         cursor: z.string().optional().describe("Pagination cursor"),
       },
     },
-    async ({ limit, cursor }) => {
+    async ({ limit, cursor }, _extra) => {
       try {
         const page = await client.customFields.list({ limit, cursor }, session.context());
         return {
@@ -46,7 +46,7 @@ export function registerCustomFieldTools(
         customFieldId: z.string().describe("The custom field ID"),
       },
     },
-    async ({ customFieldId }) => {
+    async ({ customFieldId }, _extra) => {
       try {
         const customField = await client.customFields.get(customFieldId, session.context());
         return {

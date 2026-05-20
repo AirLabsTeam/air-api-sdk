@@ -17,7 +17,7 @@ export function registerBoardTools(server: McpServer, client: AirApi, session: W
         cursor: z.string().optional().describe("Pagination cursor"),
       },
     },
-    async ({ name, parentBoardId, limit, cursor }) => {
+    async ({ name, parentBoardId, limit, cursor }, _extra) => {
       try {
         const page = await client.boards.list(
           { name, parentBoardId, limit, cursor },
@@ -49,7 +49,7 @@ export function registerBoardTools(server: McpServer, client: AirApi, session: W
         boardId: z.string().describe("The board ID"),
       },
     },
-    async ({ boardId }) => {
+    async ({ boardId }, _extra) => {
       try {
         const board = await client.boards.get(boardId, session.context());
         const url = buildBoardUrl(board.id, board.title);
@@ -71,7 +71,7 @@ export function registerBoardTools(server: McpServer, client: AirApi, session: W
         parentBoardId: z.string().optional().describe("Parent board ID to create this board under"),
       },
     },
-    async ({ title, description, parentBoardId }) => {
+    async ({ title, description, parentBoardId }, _extra) => {
       try {
         const board = await client.boards.create(
           { title, description, parentBoardId },
@@ -101,7 +101,7 @@ export function registerBoardTools(server: McpServer, client: AirApi, session: W
           .describe("New parent board ID (pass null to move to root)"),
       },
     },
-    async ({ boardId, title, description, parentBoardId }) => {
+    async ({ boardId, title, description, parentBoardId }, _extra) => {
       try {
         await client.boards.update(
           boardId,
@@ -125,7 +125,7 @@ export function registerBoardTools(server: McpServer, client: AirApi, session: W
         assetIds: z.array(z.string()).describe("Array of asset IDs to add to the board"),
       },
     },
-    async ({ boardId, assetIds }) => {
+    async ({ boardId, assetIds }, _extra) => {
       try {
         await client.boards.addAssets(boardId, { assetIds }, session.context());
         return {

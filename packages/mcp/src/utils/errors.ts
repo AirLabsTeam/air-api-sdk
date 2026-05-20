@@ -1,17 +1,19 @@
 import { APIError } from "@air/api-rest";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { WorkspaceRequiredError } from "../workspace.js";
+import { textContent } from "../types.js";
 
-export function handleToolError(error: unknown) {
+export function handleToolError(error: unknown): CallToolResult {
   if (error instanceof WorkspaceRequiredError) {
     return {
       isError: true,
-      content: [{ type: "text", text: error.message }],
+      content: [textContent(error.message)],
     };
   }
   if (error instanceof APIError) {
     return {
       isError: true,
-      content: [{ type: "text", text: `API Error (${error.status}): ${error.message}` }],
+      content: [textContent(`API Error (${error.status}): ${error.message}`)],
     };
   }
   throw error;

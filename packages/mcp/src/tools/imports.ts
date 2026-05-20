@@ -43,18 +43,21 @@ export function registerImportTools(server: McpServer, client: AirApi, session: 
           .describe("Tags to apply to the asset"),
       },
     },
-    async ({
-      sourceUrl,
-      fileName,
-      ext,
-      recordedAt,
-      parentBoardId,
-      assetId,
-      description,
-      title,
-      customFields,
-      tags,
-    }) => {
+    async (
+      {
+        sourceUrl,
+        fileName,
+        ext,
+        recordedAt,
+        parentBoardId,
+        assetId,
+        description,
+        title,
+        customFields,
+        tags,
+      },
+      _extra,
+    ) => {
       try {
         const result = await client.imports.create(
           {
@@ -95,7 +98,7 @@ export function registerImportTools(server: McpServer, client: AirApi, session: 
         importId: z.string().describe("The import task ID returned by create_import"),
       },
     },
-    async ({ importId }) => {
+    async ({ importId }, _extra) => {
       try {
         const result = await client.imports.getStatus(importId, session.context());
         return {
