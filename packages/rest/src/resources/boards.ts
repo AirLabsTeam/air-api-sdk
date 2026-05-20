@@ -53,10 +53,7 @@ export class Boards {
     context?: RequestContext,
   ): Promise<void> {
     return this.client.request<void>(
-      withRequestContext(
-        { method: "PATCH", path: `/boards/${boardId}`, body: params },
-        context,
-      ),
+      withRequestContext({ method: "PATCH", path: `/boards/${boardId}`, body: params }, context),
     );
   }
 

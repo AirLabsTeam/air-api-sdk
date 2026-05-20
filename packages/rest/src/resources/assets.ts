@@ -86,10 +86,7 @@ export class Assets {
     );
   }
 
-  async listVersions(
-    assetId: string,
-    context?: RequestContext,
-  ): Promise<AssetVersionListResponse> {
+  async listVersions(assetId: string, context?: RequestContext): Promise<AssetVersionListResponse> {
     return this.client.request<AssetVersionListResponse>(
       withRequestContext({ method: "GET", path: `/assets/${assetId}/versions` }, context),
     );
