@@ -88,7 +88,7 @@ export class AirBase {
 
     const headers: Record<string, string> = {
       "x-api-key": this.apiKey,
-      "x-air-workspace-id": this.workspaceId,
+      "x-air-workspace-id": options.workspaceId ?? this.workspaceId,
       "user-agent": `air-api-sdk/${VERSION}`,
       ...this._defaultHeaders,
       ...options.headers,

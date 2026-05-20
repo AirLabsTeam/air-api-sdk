@@ -108,4 +108,49 @@ describe("Assets", () => {
     expect(mockFetch.calls[0].url).toContain("/assets/asset-1/versions/v1/tags/tag-1");
     expect(mockFetch.calls[0].init?.method).toBe("DELETE");
   });
+
+  test("createCdnLink sends POST", async () => {
+    const cdnLink = {
+      id: "cdn-1",
+      url: "https://cdn.example.com/asset",
+      assetId: "asset-1",
+      active: true,
+      createdAt: "2024-01-01T00:00:00Z",
+    };
+    const mockFetch = createMockFetch({ status: 201, body: cdnLink });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createCdnLink("asset-1");
+    expect(result).toEqual(cdnLink);
+    expect(mockFetch.calls[0].init?.method).toBe("POST");
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLink");
+  });
+
+  test("createVersionCdnLink sends POST", async () => {
+    const cdnLink = {
+      id: "cdn-1",
+      url: "https://cdn.example.com/version",
+      assetId: "asset-1",
+      versionId: "v1",
+      active: true,
+      createdAt: "2024-01-01T00:00:00Z",
+    };
+    const mockFetch = createMockFetch({ status: 201, body: cdnLink });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createVersionCdnLink("asset-1", "v1");
+    expect(result).toEqual(cdnLink);
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/versions/v1/cdnLink");
+  });
+
+  test("per-request workspaceId overrides client default", async () => {
+    const asset = makeAsset();
+    const mockFetch = createMockFetch({ body: asset });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.get("asset-1", { workspaceId: "other-workspace" });
+
+    const headers = mockFetch.calls[0].init?.headers as Record<string, string>;
+    expect(headers["x-air-workspace-id"]).toBe("other-workspace");
+  });
 });

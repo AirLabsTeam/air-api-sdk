@@ -78,6 +78,16 @@ Headers are merged in order of precedence (last wins):
 2. `defaultHeaders` from the constructor
 3. Per-request `headers` on individual API calls
 
+### Per-request workspace ID
+
+Every endpoint accepts an optional final `context` argument with `workspaceId`. When set, it overrides the client default and `AIR_WORKSPACE_ID` environment variable for that request only:
+
+```ts
+// Use a different workspace for a single call
+const asset = await air.assets.get("asset-id", { workspaceId: "other-workspace-id" });
+const page = await air.boards.list({ limit: 10 }, { workspaceId: "other-workspace-id" });
+```
+
 ## Resources
 
 ### Boards
@@ -134,6 +144,10 @@ await air.assets.setCustomField("asset-id", "cf-id", { values: [{ id: "value-id"
 
 // List boards an asset belongs to
 const boards = await air.assets.listBoards("asset-id");
+
+// CDN links
+const assetCdnLink = await air.assets.createCdnLink("asset-id");
+const versionCdnLink = await air.assets.createVersionCdnLink("asset-id", "version-id");
 ```
 
 ### Asset versions

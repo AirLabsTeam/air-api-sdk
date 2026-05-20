@@ -1,47 +1,45 @@
+import { withRequestContext, type RequestContext } from "@air/api-core";
 import type { AirBase, PagePromise } from "@air/api-core";
 import type { Tag, TagCreateParams, TagListParams, TagUpdateParams } from "../types/tags";
 
 export class Tags {
   constructor(private client: AirBase) {}
 
-  list(params: TagListParams = {}): PagePromise<Tag> {
+  list(params: TagListParams = {}, context?: RequestContext): PagePromise<Tag> {
     return this.client.requestCursorPage<Tag>(
-      {
-        method: "GET",
-        path: "/tags",
-        query: params as Record<string, string | number | undefined>,
-      },
+      withRequestContext(
+        {
+          method: "GET",
+          path: "/tags",
+          query: params as Record<string, string | number | undefined>,
+        },
+        context,
+      ),
       params as Record<string, string | number | undefined>,
     );
   }
 
-  async get(tagId: string): Promise<Tag> {
-    return this.client.request<Tag>({
-      method: "GET",
-      path: `/tags/${tagId}`,
-    });
+  async get(tagId: string, context?: RequestContext): Promise<Tag> {
+    return this.client.request<Tag>(
+      withRequestContext({ method: "GET", path: `/tags/${tagId}` }, context),
+    );
   }
 
-  async create(params: TagCreateParams): Promise<Tag> {
-    return this.client.request<Tag>({
-      method: "POST",
-      path: "/tags",
-      body: params,
-    });
+  async create(params: TagCreateParams, context?: RequestContext): Promise<Tag> {
+    return this.client.request<Tag>(
+      withRequestContext({ method: "POST", path: "/tags", body: params }, context),
+    );
   }
 
-  async update(tagId: string, params: TagUpdateParams): Promise<void> {
-    return this.client.request<void>({
-      method: "PATCH",
-      path: `/tags/${tagId}`,
-      body: params,
-    });
+  async update(tagId: string, params: TagUpdateParams, context?: RequestContext): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext({ method: "PATCH", path: `/tags/${tagId}`, body: params }, context),
+    );
   }
 
-  async delete(tagId: string): Promise<void> {
-    return this.client.request<void>({
-      method: "DELETE",
-      path: `/tags/${tagId}`,
-    });
+  async delete(tagId: string, context?: RequestContext): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext({ method: "DELETE", path: `/tags/${tagId}` }, context),
+    );
   }
 }

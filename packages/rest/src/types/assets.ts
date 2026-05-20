@@ -72,6 +72,18 @@ export interface AssetVersionDownloadUrl {
   url: string;
 }
 
+export interface AssetCdnLink {
+  id: string;
+  url: string;
+  assetId: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface AssetVersionCdnLink extends AssetCdnLink {
+  versionId: string;
+}
+
 export interface AssetBoardListParams extends CursorPageParams {
   includeCustomFields?: boolean;
 }

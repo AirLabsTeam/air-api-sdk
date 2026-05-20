@@ -1,3 +1,4 @@
+import { withRequestContext, type RequestContext } from "@air/api-core";
 import type { AirBase } from "@air/api-core";
 import type {
   CompleteMultipartParams,
@@ -18,46 +19,56 @@ const DEFAULT_PART_SIZE = 100 * 1024 * 1024; // 100MB
 export class Uploads {
   constructor(private client: AirBase) {}
 
-  async create(params: UploadCreateParams): Promise<UploadCreateResponse> {
-    return this.client.request<UploadCreateResponse>({
-      method: "POST",
-      path: "/uploads",
-      body: params,
-    });
+  async create(
+    params: UploadCreateParams,
+    context?: RequestContext,
+  ): Promise<UploadCreateResponse> {
+    return this.client.request<UploadCreateResponse>(
+      withRequestContext({ method: "POST", path: "/uploads", body: params }, context),
+    );
   }
 
-  async getPartUploadUrl(params: GetPartUploadUrlParams): Promise<GetPartUploadUrlResponse> {
-    return this.client.request<GetPartUploadUrlResponse>({
-      method: "POST",
-      path: "/uploads/uploadPart",
-      body: params,
-    });
+  async getPartUploadUrl(
+    params: GetPartUploadUrlParams,
+    context?: RequestContext,
+  ): Promise<GetPartUploadUrlResponse> {
+    return this.client.request<GetPartUploadUrlResponse>(
+      withRequestContext({ method: "POST", path: "/uploads/uploadPart", body: params }, context),
+    );
   }
 
-  async completeMultipart(params: CompleteMultipartParams): Promise<void> {
-    return this.client.request<void>({
-      method: "POST",
-      path: "/uploads/completeMultipart",
-      body: params,
-    });
+  async completeMultipart(
+    params: CompleteMultipartParams,
+    context?: RequestContext,
+  ): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        { method: "POST", path: "/uploads/completeMultipart", body: params },
+        context,
+      ),
+    );
   }
 
   async uploadFile(
     params: UploadFileParams,
     options: UploadFileOptions = {},
+    context?: RequestContext,
   ): Promise<UploadFileResponse> {
     const meta = await resolveFileMeta(params);
 
-    const uploadResponse = await this.create({
-      fileName: meta.fileName,
-      ext: meta.ext,
-      size: meta.size,
-      mime: meta.mime,
-      parentBoardId: options.parentBoardId,
-      assetId: options.assetId,
-      customFields: options.customFields,
-      tags: options.tags,
-    });
+    const uploadResponse = await this.create(
+      {
+        fileName: meta.fileName,
+        ext: meta.ext,
+        size: meta.size,
+        mime: meta.mime,
+        parentBoardId: options.parentBoardId,
+        assetId: options.assetId,
+        customFields: options.customFields,
+        tags: options.tags,
+      },
+      context,
+    );
 
     if (isSmallUpload(uploadResponse)) {
       const data = await materializeData(meta);
@@ -65,7 +76,7 @@ export class Uploads {
       return { assetId: uploadResponse.assetId, versionId: uploadResponse.versionId };
     }
 
-    await this._uploadLargeFile(uploadResponse, meta, options.onProgress);
+    await this._uploadLargeFile(uploadResponse, meta, options.onProgress, context);
     return { assetId: uploadResponse.assetId, versionId: uploadResponse.versionId };
   }
 
@@ -94,6 +105,7 @@ export class Uploads {
     uploadInfo: LargeUploadResponse,
     meta: FileMeta,
     onProgress?: UploadFileOptions["onProgress"],
+    context?: RequestContext,
   ): Promise<void> {
     const { multiPartUploadId, key } = uploadInfo;
     const { size: totalSize } = meta;
@@ -115,7 +127,10 @@ export class Uploads {
           const bytesRead = fs.readSync(fd, chunk, 0, length, start);
           const body = bytesRead < length ? chunk.subarray(0, bytesRead) : chunk;
 
-          const { url } = await this.getPartUploadUrl({ multiPartUploadId, key, partNumber });
+          const { url } = await this.getPartUploadUrl(
+            { multiPartUploadId, key, partNumber },
+            context,
+          );
 
           const response = await fetchFn(url, { method: "PUT", body });
 
@@ -152,7 +167,10 @@ export class Uploads {
         const end = Math.min(start + DEFAULT_PART_SIZE, totalSize);
         const chunk = buf.subarray(start, end);
 
-        const { url } = await this.getPartUploadUrl({ multiPartUploadId, key, partNumber });
+        const { url } = await this.getPartUploadUrl(
+          { multiPartUploadId, key, partNumber },
+          context,
+        );
 
         const response = await fetchFn(url, { method: "PUT", body: chunk });
 
@@ -178,7 +196,7 @@ export class Uploads {
       }
     }
 
-    await this.completeMultipart({ multiPartUploadId, key, parts });
+    await this.completeMultipart({ multiPartUploadId, key, parts }, context);
   }
 }
 

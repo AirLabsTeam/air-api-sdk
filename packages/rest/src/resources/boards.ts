@@ -1,3 +1,4 @@
+import { withRequestContext, type RequestContext } from "@air/api-core";
 import type { AirBase, PagePromise } from "@air/api-core";
 import type {
   AddBoardAssetsParams,
@@ -16,7 +17,7 @@ import type {
 export class Boards {
   constructor(private client: AirBase) {}
 
-  list(params: BoardListParams = {}): PagePromise<Board> {
+  list(params: BoardListParams = {}, context?: RequestContext): PagePromise<Board> {
     const query: Record<string, string | string[] | number | boolean | undefined> = {
       limit: params.limit,
       cursor: params.cursor,
@@ -28,95 +29,138 @@ export class Boards {
       query.customField = params.customField;
     }
 
-    return this.client.requestCursorPage<Board>({ method: "GET", path: "/boards", query }, query);
+    return this.client.requestCursorPage<Board>(
+      withRequestContext({ method: "GET", path: "/boards", query }, context),
+      query,
+    );
   }
 
-  async get(boardId: string): Promise<Board> {
-    return this.client.request<Board>({
-      method: "GET",
-      path: `/boards/${boardId}`,
-    });
+  async get(boardId: string, context?: RequestContext): Promise<Board> {
+    return this.client.request<Board>(
+      withRequestContext({ method: "GET", path: `/boards/${boardId}` }, context),
+    );
   }
 
-  async create(params: BoardCreateParams): Promise<Board> {
-    return this.client.request<Board>({
-      method: "POST",
-      path: "/boards",
-      body: params,
-    });
+  async create(params: BoardCreateParams, context?: RequestContext): Promise<Board> {
+    return this.client.request<Board>(
+      withRequestContext({ method: "POST", path: "/boards", body: params }, context),
+    );
   }
 
-  async update(boardId: string, params: BoardUpdateParams): Promise<void> {
-    return this.client.request<void>({
-      method: "PATCH",
-      path: `/boards/${boardId}`,
-      body: params,
-    });
+  async update(
+    boardId: string,
+    params: BoardUpdateParams,
+    context?: RequestContext,
+  ): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        { method: "PATCH", path: `/boards/${boardId}`, body: params },
+        context,
+      ),
+    );
   }
 
-  async delete(boardId: string): Promise<void> {
-    return this.client.request<void>({
-      method: "DELETE",
-      path: `/boards/${boardId}`,
-    });
+  async delete(boardId: string, context?: RequestContext): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext({ method: "DELETE", path: `/boards/${boardId}` }, context),
+    );
   }
 
-  async addAssets(boardId: string, params: AddBoardAssetsParams): Promise<void> {
-    return this.client.request<void>({
-      method: "POST",
-      path: `/boards/${boardId}/assets`,
-      body: params,
-    });
+  async addAssets(
+    boardId: string,
+    params: AddBoardAssetsParams,
+    context?: RequestContext,
+  ): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        { method: "POST", path: `/boards/${boardId}/assets`, body: params },
+        context,
+      ),
+    );
   }
 
-  async removeAsset(boardId: string, assetId: string): Promise<void> {
-    return this.client.request<void>({
-      method: "DELETE",
-      path: `/boards/${boardId}/assets/${assetId}`,
-    });
+  async removeAsset(boardId: string, assetId: string, context?: RequestContext): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        { method: "DELETE", path: `/boards/${boardId}/assets/${assetId}` },
+        context,
+      ),
+    );
   }
 
   async setCustomField(
     boardId: string,
     customFieldId: string,
     params: SetBoardCustomFieldParams,
+    context?: RequestContext,
   ): Promise<void> {
-    return this.client.request<void>({
-      method: "PUT",
-      path: `/boards/${boardId}/customFields/${customFieldId}`,
-      body: params,
-    });
+    return this.client.request<void>(
+      withRequestContext(
+        {
+          method: "PUT",
+          path: `/boards/${boardId}/customFields/${customFieldId}`,
+          body: params,
+        },
+        context,
+      ),
+    );
   }
 
-  async addGuest(boardId: string, params: AddGuestParams): Promise<Guest> {
-    return this.client.request<Guest>({
-      method: "POST",
-      path: `/boards/${boardId}/guests`,
-      body: params,
-    });
+  async addGuest(
+    boardId: string,
+    params: AddGuestParams,
+    context?: RequestContext,
+  ): Promise<Guest> {
+    return this.client.request<Guest>(
+      withRequestContext(
+        { method: "POST", path: `/boards/${boardId}/guests`, body: params },
+        context,
+      ),
+    );
   }
 
-  async listGuests(boardId: string, params: GuestListParams = {}): Promise<Guest[]> {
-    const response = await this.client.request<GuestListResponse>({
-      method: "GET",
-      path: `/boards/${boardId}/guests`,
-      query: params.email ? { email: params.email } : undefined,
-    });
+  async listGuests(
+    boardId: string,
+    params: GuestListParams = {},
+    context?: RequestContext,
+  ): Promise<Guest[]> {
+    const response = await this.client.request<GuestListResponse>(
+      withRequestContext(
+        {
+          method: "GET",
+          path: `/boards/${boardId}/guests`,
+          query: params.email ? { email: params.email } : undefined,
+        },
+        context,
+      ),
+    );
     return response.data;
   }
 
-  async updateGuest(boardId: string, guestId: string, params: UpdateGuestParams): Promise<void> {
-    return this.client.request<void>({
-      method: "PATCH",
-      path: `/boards/${boardId}/guests/${guestId}`,
-      body: params,
-    });
+  async updateGuest(
+    boardId: string,
+    guestId: string,
+    params: UpdateGuestParams,
+    context?: RequestContext,
+  ): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        {
+          method: "PATCH",
+          path: `/boards/${boardId}/guests/${guestId}`,
+          body: params,
+        },
+        context,
+      ),
+    );
   }
 
-  async removeGuest(boardId: string, guestId: string): Promise<void> {
-    return this.client.request<void>({
-      method: "DELETE",
-      path: `/boards/${boardId}/guests/${guestId}`,
-    });
+  async removeGuest(boardId: string, guestId: string, context?: RequestContext): Promise<void> {
+    return this.client.request<void>(
+      withRequestContext(
+        { method: "DELETE", path: `/boards/${boardId}/guests/${guestId}` },
+        context,
+      ),
+    );
   }
 }

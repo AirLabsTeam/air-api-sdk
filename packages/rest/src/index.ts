@@ -18,6 +18,8 @@ export {
   type CursorPageParams,
   type CursorPageResponse,
   type RequestOptions,
+  type RequestContext,
+  withRequestContext,
   VERSION,
 } from "@air/api-core";
 

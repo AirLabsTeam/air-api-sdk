@@ -1,3 +1,4 @@
+import { withRequestContext, type RequestContext } from "@air/api-core";
 import type { AirBase } from "@air/api-core";
 import type {
   ImportCreateParams,
@@ -8,18 +9,18 @@ import type {
 export class Imports {
   constructor(private client: AirBase) {}
 
-  async create(params: ImportCreateParams): Promise<ImportCreateResponse> {
-    return this.client.request<ImportCreateResponse>({
-      method: "POST",
-      path: "/imports",
-      body: params,
-    });
+  async create(
+    params: ImportCreateParams,
+    context?: RequestContext,
+  ): Promise<ImportCreateResponse> {
+    return this.client.request<ImportCreateResponse>(
+      withRequestContext({ method: "POST", path: "/imports", body: params }, context),
+    );
   }
 
-  async getStatus(importId: string): Promise<ImportStatusResponse> {
-    return this.client.request<ImportStatusResponse>({
-      method: "GET",
-      path: `/imports/${importId}/status`,
-    });
+  async getStatus(importId: string, context?: RequestContext): Promise<ImportStatusResponse> {
+    return this.client.request<ImportStatusResponse>(
+      withRequestContext({ method: "GET", path: `/imports/${importId}/status` }, context),
+    );
   }
 }
