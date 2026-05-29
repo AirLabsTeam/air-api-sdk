@@ -45,6 +45,7 @@ const air = new AirApi(); // reads from env
 ```ts
 const air = new AirApi({
   apiKey: "your-api-key", // or AIR_API_KEY env var
+  accessToken: "your-oauth-token", // or AIR_ACCESS_TOKEN env var (mutually exclusive with apiKey)
   workspaceId: "your-workspace-id", // or AIR_WORKSPACE_ID env var
   baseURL: "https://api.air.inc/v1", // default
   maxRetries: 3, // default, with exponential backoff
@@ -56,6 +57,35 @@ const air = new AirApi({
   },
 });
 ```
+
+## Authentication
+
+The SDK supports two authentication modes; choose exactly one per client.
+
+### API key (workspace-scoped)
+
+The classic mode. The key is tied to a single workspace, so `workspaceId` is required.
+
+```ts
+const air = new AirApi({ apiKey: "...", workspaceId: "..." });
+```
+
+The SDK sends `x-api-key` and `x-air-workspace-id` on every request.
+
+### OAuth 2.0 bearer token
+
+For integrations that need cross-workspace access or for endpoints that don't accept API keys (notably the discovery endpoint `GET /v1/workspaces`):
+
+```ts
+const air = new AirApi({ accessToken: "..." });
+
+// workspaceId is optional in bearer mode — required only for workspace-scoped calls
+const air = new AirApi({ accessToken: "...", workspaceId: "..." });
+```
+
+When `accessToken` is set the SDK sends `Authorization: Bearer …` and only includes `x-air-workspace-id` if a `workspaceId` is configured. Explicit constructor options always win over env vars, so an unrelated `AIR_ACCESS_TOKEN` in your shell won't conflict with an `apiKey` you pass directly.
+
+See [OAuth helpers](#oauth-helpers) below for acquiring tokens.
 
 ### Custom headers
 
@@ -74,7 +104,7 @@ const air = new AirApi({
 
 Headers are merged in order of precedence (last wins):
 
-1. SDK defaults (`x-api-key`, `x-air-workspace-id`, `user-agent: air-api-sdk/<version>`)
+1. SDK defaults (`x-api-key` or `Authorization: Bearer …`, plus `x-air-workspace-id` when configured, and `user-agent: air-api-sdk/<version>`)
 2. `defaultHeaders` from the constructor
 3. Per-request `headers` on individual API calls
 
@@ -245,6 +275,101 @@ const status = await air.imports.getStatus(imp.id);
 console.log(status.status); // 'pending' | 'inProgress' | 'succeeded' | 'failed'
 ```
 
+### Workspaces
+
+Discovery endpoint that lists the workspaces the authenticated principal can access. **Requires OAuth bearer auth** — API keys are bound to a single workspace and so cannot be used here. The `x-air-workspace-id` header must not be sent for this call, which is why the client supports being constructed without a `workspaceId` when using `accessToken`.
+
+```ts
+const air = new AirApi({ accessToken: "..." });
+const workspaces = await air.workspaces.list();
+// [{ id, name }, ...]
+```
+
+Requires the `workspace.read` OAuth scope.
+
+## OAuth helpers
+
+The SDK exposes helpers for acquiring tokens via both common OAuth 2.0 flows so consumers don't need a separate library. All return `{ accessToken, tokenType, expiresIn, scope? }` suitable for passing into `new AirApi({ accessToken })`.
+
+### Client credentials (machine-to-machine)
+
+For server-side integrations with a confidential client.
+
+```ts
+import { AirApi, getOAuthAccessToken } from "@air/api-sdk";
+
+const { accessToken } = await getOAuthAccessToken({
+  clientId: process.env.AIR_OAUTH_CLIENT_ID!,
+  clientSecret: process.env.AIR_OAUTH_CLIENT_SECRET!,
+  tokenUrl: "https://auth.air.inc/oauth2/token",
+  scopes: ["public-api/assets.read", "public-api/boards.read"],
+});
+
+const air = new AirApi({ accessToken });
+```
+
+### Authorization code + PKCE (user-facing)
+
+For tools that authenticate on behalf of a human (e.g. CLI utilities, desktop apps). The three pieces compose:
+
+```ts
+import {
+  generatePKCEChallenge,
+  buildAuthorizationUrl,
+  exchangeAuthorizationCode,
+} from "@air/api-sdk";
+
+// 1. Generate the PKCE pair and keep the verifier around.
+const { codeVerifier, codeChallenge } = generatePKCEChallenge();
+const state = crypto.randomBytes(16).toString("hex");
+
+// 2. Send the user to Air's consent URL (NOT directly to the authorization
+//    server — the Air consent flow records the per-account scope grant and
+//    then completes the OAuth handoff).
+const url = buildAuthorizationUrl({
+  authorizeUrl: "https://app.air.inc/oauth/consent",
+  clientId: "...",
+  redirectUri: "https://example.com/oauth/air/callback",
+  codeChallenge,
+  state,
+  scopes: ["assets.read", "boards.read"], // bare names; Air adds the prefix
+});
+
+// 3. After the redirect arrives at your callback URL, exchange the code:
+const { accessToken } = await exchangeAuthorizationCode({
+  tokenUrl: "https://auth.air.inc/oauth2/token",
+  clientId: "...",
+  clientSecret: "...", // omit for public clients
+  code, // from the callback query string
+  codeVerifier,
+  redirectUri: "https://example.com/oauth/air/callback",
+});
+```
+
+Scope handling differs by entry point: Air's `/oauth/consent` page expects bare names (`assets.read`) and applies the resource-server prefix itself; the authorization server's `/oauth2/authorize` (and `/oauth2/token`) expect the fully-qualified form (`public-api/assets.read`).
+
+### Client authentication
+
+For confidential clients (those with a `clientSecret`), both `getOAuthAccessToken` and `exchangeAuthorizationCode` accept a `clientAuthMethod` option:
+
+| Value               | Behavior                                                                                                                |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `"basic"` (default) | Sends `Authorization: Basic base64(client_id:client_secret)`. Preferred per RFC 6749 §2.3.1.                            |
+| `"body"`            | Sends `client_id` and `client_secret` in the form body. Use this when an upstream proxy strips `Authorization` headers. |
+
+Public clients (no `clientSecret`) always send `client_id` in the body and never set an `Authorization` header.
+
+```ts
+await getOAuthAccessToken({
+  clientId: "...",
+  clientSecret: "...",
+  tokenUrl: "https://auth.air.inc/oauth2/token",
+  clientAuthMethod: "body", // override the default
+});
+```
+
+Errors from any of these helpers surface as the standard `APIError` subclasses (`AuthenticationError`, `BadRequestError`, etc.) and `ConnectionError` on network failures.
+
 ## Pagination
 
 List methods return a `PagePromise` that supports two patterns:
@@ -333,13 +458,44 @@ npm test
 # or: yarn test / bun run test
 ```
 
-End-to-end tests (requires API credentials):
+End-to-end tests (requires real API credentials in `.env.test`):
 
 ```bash
 cp .env.example .env.test
-# fill in AIR_API_KEY and AIR_WORKSPACE_ID
+# fill in credentials, then:
 npm run test:e2e
 ```
+
+The suite can run against either auth mode, selected via `AIR_E2E_AUTH_MODE`:
+
+| Mode               | Required env vars                                   | What it exercises                                                                                  |
+| ------------------ | --------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `apikey` (default) | `AIR_API_KEY`, `AIR_WORKSPACE_ID`                   | All existing resources via `x-api-key`. `tests/e2e/workspaces.test.ts` is skipped.                 |
+| `oauth`            | `AIR_WORKSPACE_ID`, plus a cached token (see below) | Same resources via `Authorization: Bearer …`, **plus** the discovery test in `workspaces.test.ts`. |
+
+CI typically runs both passes to catch divergence between the two auth paths.
+
+#### Acquiring a token for `oauth` mode
+
+`tests/e2e/helpers/global-setup.ts` reads a pre-acquired token from `.oauth-token-cache.json` (gitignored). Run the helper script to populate that file via the authorization_code + PKCE flow:
+
+```bash
+npm run e2e:get-token
+```
+
+The script reads OAuth config from `.env.test`:
+
+| Env var                       | Required                  | Notes                                                                                                                                                       |
+| ----------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AIR_OAUTH_CLIENT_ID`         | yes                       | OAuth client ID provisioned by Air                                                                                                                          |
+| `AIR_OAUTH_CLIENT_SECRET`     | yes (confidential client) | OAuth client secret                                                                                                                                         |
+| `AIR_OAUTH_TOKEN_URL`         | yes                       | e.g. `https://auth.air.inc/oauth2/token` (use your environment's value)                                                                                     |
+| `AIR_OAUTH_AUTHORIZE_URL`     | yes                       | Air's consent URL, e.g. `https://app.air.inc/oauth/consent` — **not** the authorization server's `/authorize` (see [OAuth helpers](#oauth-helpers) for why) |
+| `AIR_OAUTH_REDIRECT_URI`      | no                        | Defaults to `http://localhost:3000/oauth/callback`; must be registered for the OAuth client                                                                 |
+| `AIR_OAUTH_SCOPES`            | no                        | Space- or newline-separated bare scope names; defaults to the full set the SDK exercises                                                                    |
+| `AIR_OAUTH_MAX_PORT_ATTEMPTS` | no                        | Defaults to 10; the script walks ports upward from the redirect_uri's port when one is busy                                                                 |
+
+The script spins up a local HTTP server on the redirect_uri's port, prints the URL to open in a browser, and writes the resulting token (and expiry) to `.oauth-token-cache.json`. Tokens typically expire after ~60 minutes — re-run the script when expired.
 
 ### Type checking
 

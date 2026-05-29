@@ -9,6 +9,7 @@
     "build": "npm run -w packages/core build && npm run -w packages/rest build && npm run -w packages/sdk build",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "e2e:get-token": "node scripts/get-oauth-token.mjs",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

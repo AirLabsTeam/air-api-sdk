@@ -5,3 +5,4 @@ export * from "./custom-fields";
 export * from "./roles";
 export * from "./imports";
 export * from "./uploads";
+export * from "./workspaces";

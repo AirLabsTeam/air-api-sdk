@@ -7,6 +7,7 @@ import { VERSION } from "./version";
 
 export interface AirBaseOptions {
   apiKey?: string;
+  accessToken?: string;
   workspaceId?: string;
   baseURL?: string;
   maxRetries?: number;
@@ -16,8 +17,9 @@ export interface AirBaseOptions {
 }
 
 export class AirBase {
-  readonly apiKey: string;
-  workspaceId: string;
+  readonly apiKey: string | undefined;
+  readonly accessToken: string | undefined;
+  workspaceId: string | undefined;
   readonly baseURL: string;
   readonly maxRetries: number;
   readonly timeout: number;
@@ -25,21 +27,50 @@ export class AirBase {
   private _defaultHeaders: Record<string, string>;
 
   constructor(options: AirBaseOptions = {}) {
-    const apiKey = options.apiKey ?? process.env.AIR_API_KEY;
-    if (!apiKey) {
+    // Explicit options select the auth mode. Env vars are only consulted if
+    // neither auth option is provided explicitly, so an unrelated env var
+    // (e.g. AIR_ACCESS_TOKEN sitting in .env.test) doesn't conflict with an
+    // explicit `apiKey` constructor argument.
+    let apiKey: string | undefined;
+    let accessToken: string | undefined;
+
+    if (options.apiKey !== undefined && options.accessToken !== undefined) {
       throw new Error(
-        "API key is required. Pass it as `apiKey` option or set the AIR_API_KEY environment variable.",
+        "Provide either `apiKey` or `accessToken`, not both. API key auth and OAuth bearer auth are mutually exclusive.",
+      );
+    }
+
+    if (options.apiKey !== undefined) {
+      apiKey = options.apiKey;
+    } else if (options.accessToken !== undefined) {
+      accessToken = options.accessToken;
+    } else {
+      const envApiKey = process.env.AIR_API_KEY;
+      const envAccessToken = process.env.AIR_ACCESS_TOKEN;
+      if (envApiKey && envAccessToken) {
+        throw new Error(
+          "Both AIR_API_KEY and AIR_ACCESS_TOKEN are set. Set only one, or pass `apiKey`/`accessToken` explicitly to choose.",
+        );
+      }
+      apiKey = envApiKey;
+      accessToken = envAccessToken;
+    }
+
+    if (!apiKey && !accessToken) {
+      throw new Error(
+        "Authentication is required. Pass `apiKey` (or set AIR_API_KEY) for API key auth, or `accessToken` (or set AIR_ACCESS_TOKEN) for OAuth bearer auth.",
       );
     }
 
     const workspaceId = options.workspaceId ?? process.env.AIR_WORKSPACE_ID;
-    if (!workspaceId) {
+    if (apiKey && !workspaceId) {
       throw new Error(
-        "Workspace ID is required. Pass it as `workspaceId` option or set the AIR_WORKSPACE_ID environment variable.",
+        "Workspace ID is required when using API key authentication. Pass it as `workspaceId` option or set the AIR_WORKSPACE_ID environment variable.",
       );
     }
 
     this.apiKey = apiKey;
+    this.accessToken = accessToken;
     this.workspaceId = workspaceId;
     this.baseURL = (options.baseURL ?? "https://api.air.inc/v1").replace(/\/$/, "");
     this.maxRetries = options.maxRetries ?? 3;
@@ -87,12 +118,20 @@ export class AirBase {
     const url = this._buildURL(options.path, options.query);
 
     const headers: Record<string, string> = {
-      "x-api-key": this.apiKey,
-      "x-air-workspace-id": this.workspaceId,
       "user-agent": `air-api-sdk/${VERSION}`,
-      ...this._defaultHeaders,
-      ...options.headers,
     };
+
+    if (this.apiKey) {
+      headers["x-api-key"] = this.apiKey;
+    } else if (this.accessToken) {
+      headers["authorization"] = `Bearer ${this.accessToken}`;
+    }
+
+    if (this.workspaceId) {
+      headers["x-air-workspace-id"] = this.workspaceId;
+    }
+
+    Object.assign(headers, this._defaultHeaders, options.headers);
 
     if (options.body !== undefined) {
       headers["content-type"] = "application/json";
