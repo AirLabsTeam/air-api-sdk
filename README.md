@@ -471,17 +471,16 @@ npm run e2e:get-token
 
 The script reads OAuth config from `.env.test`:
 
-| Env var                       | Required                  | Notes                                                                                                                                                       |
-| ----------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AIR_OAUTH_CLIENT_ID`         | yes                       | OAuth client ID provisioned by Air                                                                                                                          |
-| `AIR_OAUTH_CLIENT_SECRET`     | yes (confidential client) | OAuth client secret                                                                                                                                         |
-| `AIR_OAUTH_TOKEN_URL`         | yes                       | e.g. `https://auth.air.inc/oauth2/token` (use your environment's value)                                                                                     |
-| `AIR_OAUTH_AUTHORIZE_URL`     | yes                       | Air's consent URL, e.g. `https://app.air.inc/oauth/consent` — **not** the authorization server's `/authorize` (see [OAuth helpers](#oauth-helpers) for why) |
-| `AIR_OAUTH_REDIRECT_URI`      | no                        | Defaults to `http://localhost:3000/oauth/callback`; must be registered for the OAuth client                                                                 |
-| `AIR_OAUTH_SCOPES`            | no                        | Space- or newline-separated bare scope names; defaults to the full set the SDK exercises                                                                    |
-| `AIR_OAUTH_MAX_PORT_ATTEMPTS` | no                        | Defaults to 10; the script walks ports upward from the redirect_uri's port when one is busy                                                                 |
+| Env var                   | Required                  | Notes                                                                                                                                                       |
+| ------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AIR_OAUTH_CLIENT_ID`     | yes                       | OAuth client ID provisioned by Air                                                                                                                          |
+| `AIR_OAUTH_CLIENT_SECRET` | yes (confidential client) | OAuth client secret                                                                                                                                         |
+| `AIR_OAUTH_TOKEN_URL`     | yes                       | e.g. `https://auth.air.inc/oauth2/token` (use your environment's value)                                                                                     |
+| `AIR_OAUTH_AUTHORIZE_URL` | yes                       | Air's consent URL, e.g. `https://app.air.inc/oauth/consent` — **not** the authorization server's `/authorize` (see [OAuth helpers](#oauth-helpers) for why) |
+| `AIR_OAUTH_REDIRECT_URI`  | no                        | Defaults to `http://localhost:3000/oauth/callback`; must be registered for the OAuth client                                                                 |
+| `AIR_OAUTH_SCOPES`        | no                        | Space- or newline-separated bare scope names; defaults to the full set the SDK exercises                                                                    |
 
-The script spins up a local HTTP server on the redirect_uri's port, prints the URL to open in a browser, and writes the resulting token (and expiry) to `.oauth-token-cache.json`. Tokens typically expire after ~60 minutes — re-run the script when expired.
+The script binds a local HTTP server to the redirect_uri's port, prints the URL to open in a browser, and writes the resulting token (and expiry) to `.oauth-token-cache.json`. If the port is already in use the script fails fast with instructions for finding and killing the offending process; it does not silently fall back to a different port because the OAuth client would reject the resulting redirect_uri. Tokens typically expire after ~60 minutes — re-run the script when expired.
 
 ### Type checking
 

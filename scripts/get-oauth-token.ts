@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx
 // Acquires an OAuth bearer token via the authorization_code + PKCE flow and
 // writes it to .oauth-token-cache.json for the e2e suite to pick up.
 //
@@ -17,9 +17,9 @@
 //   AIR_OAUTH_TOKEN_URL       (required, e.g. https://auth.air.inc/oauth2/token)
 //   AIR_OAUTH_AUTHORIZE_URL   (required — Air's consent URL, e.g. https://app.air.inc/oauth/consent)
 //   AIR_OAUTH_REDIRECT_URI    (optional, defaults to http://localhost:3000/oauth/callback)
-//   AIR_OAUTH_SCOPES          (optional, space/newline separated bare scopes; we prepend public-api/)
+//   AIR_OAUTH_SCOPES          (optional, space/newline separated bare scopes)
 
-import { createServer } from "node:http";
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
 import { chmod, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -33,7 +33,7 @@ import {
 loadEnv({ path: ".env.test" });
 
 const DEFAULT_REDIRECT_URI = "http://localhost:3000/oauth/callback";
-const DEFAULT_SCOPES = [
+const DEFAULT_SCOPES: readonly string[] = [
   "assets.read",
   "assets.write",
   "boards.read",
@@ -47,7 +47,7 @@ const DEFAULT_SCOPES = [
 ];
 const CACHE_PATH = resolve(process.cwd(), ".oauth-token-cache.json");
 
-function required(name) {
+function required(name: string): string {
   const v = process.env[name];
   if (!v) {
     console.error(`Missing required env var: ${name}`);
@@ -56,7 +56,7 @@ function required(name) {
   return v;
 }
 
-function requiredAuthorizeUrl() {
+function requiredAuthorizeUrl(): string {
   const v = process.env.AIR_OAUTH_AUTHORIZE_URL;
   if (!v) {
     console.error(
@@ -69,44 +69,34 @@ function requiredAuthorizeUrl() {
   return v;
 }
 
-async function main() {
+async function main(): Promise<void> {
   const clientId = required("AIR_OAUTH_CLIENT_ID");
   const clientSecret = process.env.AIR_OAUTH_CLIENT_SECRET;
   const tokenUrl = required("AIR_OAUTH_TOKEN_URL");
   const authorizeUrl = requiredAuthorizeUrl();
   const redirectUri = process.env.AIR_OAUTH_REDIRECT_URI ?? DEFAULT_REDIRECT_URI;
 
-  // Air's /oauth/consent expects bare scope names — it manages the
+  // Air's /oauth/consent expects bare scope names; it manages the
   // `public-api/` resource-server prefix internally. We do NOT prepend
   // it here. (Direct authorization-server calls would need the prefix.)
   const scopeOverride = process.env.AIR_OAUTH_SCOPES;
-  const scopes = scopeOverride ? scopeOverride.split(/\s+/).filter(Boolean) : DEFAULT_SCOPES;
+  const scopes = scopeOverride
+    ? scopeOverride.split(/\s+/).filter(Boolean)
+    : [...DEFAULT_SCOPES];
 
   const redirect = new URL(redirectUri);
-  const requestedPort = Number(redirect.port || (redirect.protocol === "https:" ? 443 : 80));
+  const port = Number(redirect.port || (redirect.protocol === "https:" ? 443 : 80));
   const expectedPath = redirect.pathname;
-  const maxPortAttempts = Number(process.env.AIR_OAUTH_MAX_PORT_ATTEMPTS ?? 10);
 
   const { codeVerifier, codeChallenge } = generatePKCEChallenge();
   const state = randomBytes(16).toString("hex");
 
-  const { server, port: actualPort } = await listenWithFallback({
-    startPort: requestedPort,
-    maxAttempts: maxPortAttempts,
-  });
-
-  if (actualPort !== requestedPort) {
-    redirect.port = String(actualPort);
-    console.warn(
-      `Port ${requestedPort} was busy; falling back to ${actualPort}. NOTE: the OAuth client must have ${redirect.toString()} registered as a redirect URI, otherwise the authorize request will be rejected.`,
-    );
-  }
-  const effectiveRedirectUri = redirect.toString();
+  const server = await listenOrFail(port, redirectUri);
 
   const authUrl = buildAuthorizationUrl({
     authorizeUrl,
     clientId,
-    redirectUri: effectiveRedirectUri,
+    redirectUri,
     codeChallenge,
     state,
     scopes,
@@ -117,7 +107,7 @@ async function main() {
     expectedPath,
     expectedState: state,
     authUrl,
-    port: actualPort,
+    port,
   });
 
   console.log("\nGot authorization code. Exchanging for token…");
@@ -127,7 +117,7 @@ async function main() {
     clientSecret,
     code,
     codeVerifier,
-    redirectUri: effectiveRedirectUri,
+    redirectUri,
   });
 
   const expiresAt = Date.now() + token.expiresIn * 1000;
@@ -159,53 +149,54 @@ async function main() {
   console.log("\nYou can now run: npm run test:e2e");
 }
 
-function listenWithFallback({ startPort, maxAttempts }) {
-  let port = startPort;
-  const attemptedPorts = [];
-
+function listenOrFail(port: number, redirectUri: string): Promise<Server> {
   return new Promise((resolvePromise, rejectPromise) => {
-    const tryNext = () => {
-      if (attemptedPorts.length >= maxAttempts) {
+    const server = createServer();
+
+    const onError = (err: NodeJS.ErrnoException) => {
+      server.removeListener("listening", onListening);
+      if (err.code === "EADDRINUSE") {
         rejectPromise(
           new Error(
-            `Could not bind any port in [${startPort}, ${startPort + maxAttempts - 1}]. Tried: ${attemptedPorts.join(", ")}.`,
+            `Port ${port} is already in use, so the OAuth callback server can't bind to ${redirectUri}.\n` +
+              `  Free the port (find the process with \`lsof -nP -iTCP:${port} -sTCP:LISTEN\` and kill it) and re-run.\n` +
+              `  Or set AIR_OAUTH_REDIRECT_URI to a different host/port that's registered as a redirect URI for the OAuth client.`,
           ),
         );
-        return;
+      } else {
+        rejectPromise(err);
       }
-
-      attemptedPorts.push(port);
-      const server = createServer();
-
-      const onError = (err) => {
-        server.removeListener("listening", onListening);
-        if (err.code === "EADDRINUSE") {
-          server.close();
-          port += 1;
-          tryNext();
-        } else {
-          rejectPromise(err);
-        }
-      };
-
-      const onListening = () => {
-        server.removeListener("error", onError);
-        resolvePromise({ server, port });
-      };
-
-      server.once("error", onError);
-      server.once("listening", onListening);
-      server.listen(port);
     };
 
-    tryNext();
+    const onListening = () => {
+      server.removeListener("error", onError);
+      resolvePromise(server);
+    };
+
+    server.once("error", onError);
+    server.once("listening", onListening);
+    server.listen(port);
   });
 }
 
-function captureRedirectCode({ server, port, expectedPath, expectedState, authUrl }) {
+interface CaptureRedirectCodeOptions {
+  server: Server;
+  port: number;
+  expectedPath: string;
+  expectedState: string;
+  authUrl: string;
+}
+
+function captureRedirectCode({
+  server,
+  port,
+  expectedPath,
+  expectedState,
+  authUrl,
+}: CaptureRedirectCodeOptions): Promise<string> {
   return new Promise((resolvePromise, rejectPromise) => {
-    server.on("request", (req, res) => {
-      const url = new URL(req.url, `http://localhost:${port}`);
+    server.on("request", (req: IncomingMessage, res: ServerResponse) => {
+      const url = new URL(req.url ?? "/", `http://localhost:${port}`);
       if (url.pathname !== expectedPath) {
         res.writeHead(404).end("Not found");
         return;
@@ -263,21 +254,26 @@ function captureRedirectCode({ server, port, expectedPath, expectedState, authUr
   });
 }
 
-function respond(res, status, message) {
+function respond(res: ServerResponse, status: number, message: string): void {
   res.writeHead(status, { "content-type": "text/html; charset=utf-8" });
   res.end(
     `<!doctype html><meta charset="utf-8"><title>OAuth</title><body style="font-family: system-ui; padding: 2rem"><p>${escapeHtml(message)}</p></body>`,
   );
 }
 
-function escapeHtml(s) {
-  return s.replace(
-    /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
-  );
+function escapeHtml(s: string): string {
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return s.replace(/[&<>"']/g, (c) => map[c] ?? c);
 }
 
-main().catch((err) => {
-  console.error("\n✗ Failed to acquire token:", err.message || err);
+main().catch((err: unknown) => {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error("\n✗ Failed to acquire token:", message);
   process.exit(1);
 });
