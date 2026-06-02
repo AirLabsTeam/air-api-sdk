@@ -1,10 +1,6 @@
 import { describe, expect, test } from "vitest";
-import {
-  buildAuthorizationUrl,
-  exchangeAuthorizationCode,
-  getOAuthAccessToken,
-} from "../src/oauth";
-import { AuthenticationError, ConnectionError } from "../src/errors";
+import { buildAuthorizationUrl, exchangeAuthorizationCode } from "../src/oauth";
+import { AuthenticationError } from "../src/errors";
 import { createMockFetch } from "./helpers/mock-fetch";
 
 const TOKEN_URL = "https://auth.example.com/oauth2/token";
@@ -19,125 +15,6 @@ function rawToken(overrides: Partial<Record<string, unknown>> = {}) {
     ...overrides,
   };
 }
-
-describe("getOAuthAccessToken", () => {
-  test("defaults to Basic auth and returns camelCased fields", async () => {
-    const mockFetch = createMockFetch({ body: rawToken({ scope: "public-api/assets.read" }) });
-    const token = await getOAuthAccessToken({
-      clientId: "cid",
-      clientSecret: "csecret",
-      tokenUrl: TOKEN_URL,
-      fetch: mockFetch as unknown as typeof globalThis.fetch,
-    });
-
-    expect(token).toEqual({
-      accessToken: "the-access-token",
-      tokenType: "Bearer",
-      expiresIn: 3600,
-      scope: "public-api/assets.read",
-    });
-
-    const call = mockFetch.calls[0];
-    expect(call.url).toBe(TOKEN_URL);
-    expect(call.init?.method).toBe("POST");
-    const headers = call.init?.headers as Record<string, string>;
-    expect(headers["content-type"]).toBe("application/x-www-form-urlencoded");
-    expect(headers["authorization"]).toBe(`Basic ${Buffer.from("cid:csecret").toString("base64")}`);
-
-    const body = new URLSearchParams(call.init?.body as string);
-    expect(body.get("grant_type")).toBe("client_credentials");
-    expect(body.has("client_id")).toBe(false);
-    expect(body.has("client_secret")).toBe(false);
-  });
-
-  test("body auth method sends credentials in the body and no Authorization header", async () => {
-    const mockFetch = createMockFetch({ body: rawToken() });
-    await getOAuthAccessToken({
-      clientId: "cid",
-      clientSecret: "csecret",
-      tokenUrl: TOKEN_URL,
-      clientAuthMethod: "body",
-      fetch: mockFetch as unknown as typeof globalThis.fetch,
-    });
-
-    const call = mockFetch.calls[0];
-    const headers = call.init?.headers as Record<string, string>;
-    expect(headers["authorization"]).toBeUndefined();
-    const body = new URLSearchParams(call.init?.body as string);
-    expect(body.get("client_id")).toBe("cid");
-    expect(body.get("client_secret")).toBe("csecret");
-  });
-
-  test("joins array scopes with spaces", async () => {
-    const mockFetch = createMockFetch({ body: rawToken() });
-    await getOAuthAccessToken({
-      clientId: "cid",
-      clientSecret: "csecret",
-      tokenUrl: TOKEN_URL,
-      scopes: ["public-api/assets.read", "public-api/boards.read"],
-      fetch: mockFetch as unknown as typeof globalThis.fetch,
-    });
-
-    const body = new URLSearchParams(mockFetch.calls[0].init?.body as string);
-    expect(body.get("scope")).toBe("public-api/assets.read public-api/boards.read");
-  });
-
-  test("passes string scope verbatim", async () => {
-    const mockFetch = createMockFetch({ body: rawToken() });
-    await getOAuthAccessToken({
-      clientId: "cid",
-      clientSecret: "csecret",
-      tokenUrl: TOKEN_URL,
-      scopes: "public-api/workspace.read",
-      fetch: mockFetch as unknown as typeof globalThis.fetch,
-    });
-
-    const body = new URLSearchParams(mockFetch.calls[0].init?.body as string);
-    expect(body.get("scope")).toBe("public-api/workspace.read");
-  });
-
-  test("omits scope when empty string", async () => {
-    const mockFetch = createMockFetch({ body: rawToken() });
-    await getOAuthAccessToken({
-      clientId: "cid",
-      clientSecret: "csecret",
-      tokenUrl: TOKEN_URL,
-      scopes: "",
-      fetch: mockFetch as unknown as typeof globalThis.fetch,
-    });
-
-    const body = new URLSearchParams(mockFetch.calls[0].init?.body as string);
-    expect(body.has("scope")).toBe(false);
-  });
-
-  test("throws APIError subclass on non-2xx", async () => {
-    const mockFetch = createMockFetch({ status: 401, body: { message: "invalid_client" } });
-
-    await expect(
-      getOAuthAccessToken({
-        clientId: "cid",
-        clientSecret: "wrong",
-        tokenUrl: TOKEN_URL,
-        fetch: mockFetch as unknown as typeof globalThis.fetch,
-      }),
-    ).rejects.toBeInstanceOf(AuthenticationError);
-  });
-
-  test("wraps network errors in ConnectionError", async () => {
-    const failingFetch = (async () => {
-      throw new Error("DNS failure");
-    }) as unknown as typeof globalThis.fetch;
-
-    await expect(
-      getOAuthAccessToken({
-        clientId: "cid",
-        clientSecret: "csecret",
-        tokenUrl: TOKEN_URL,
-        fetch: failingFetch,
-      }),
-    ).rejects.toBeInstanceOf(ConnectionError);
-  });
-});
 
 describe("buildAuthorizationUrl", () => {
   test("constructs a URL with all required PKCE params and joined scope", () => {
@@ -239,6 +116,43 @@ describe("exchangeAuthorizationCode", () => {
     const body = new URLSearchParams(call.init?.body as string);
     expect(body.get("client_id")).toBe("cid");
     expect(body.has("client_secret")).toBe(false);
+  });
+
+  test("surfaces refresh_token when the server returns one", async () => {
+    const mockFetch = createMockFetch({
+      body: rawToken({ refresh_token: "the-refresh-token", scope: "public-api/assets.read" }),
+    });
+    const token = await exchangeAuthorizationCode({
+      tokenUrl: TOKEN_URL,
+      clientId: "cid",
+      clientSecret: "csecret",
+      code: "auth-code",
+      codeVerifier: "verifier",
+      redirectUri: REDIRECT_URI,
+      fetch: mockFetch as unknown as typeof globalThis.fetch,
+    });
+
+    expect(token).toEqual({
+      accessToken: "the-access-token",
+      tokenType: "Bearer",
+      expiresIn: 3600,
+      scope: "public-api/assets.read",
+      refreshToken: "the-refresh-token",
+    });
+  });
+
+  test("refreshToken is undefined when the server omits it", async () => {
+    const mockFetch = createMockFetch({ body: rawToken() });
+    const token = await exchangeAuthorizationCode({
+      tokenUrl: TOKEN_URL,
+      clientId: "cid",
+      clientSecret: "csecret",
+      code: "auth-code",
+      codeVerifier: "verifier",
+      redirectUri: REDIRECT_URI,
+      fetch: mockFetch as unknown as typeof globalThis.fetch,
+    });
+    expect(token.refreshToken).toBeUndefined();
   });
 
   test("throws APIError on non-2xx", async () => {

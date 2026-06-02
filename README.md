@@ -289,28 +289,11 @@ Requires the `workspace.read` OAuth scope.
 
 ## OAuth helpers
 
-The SDK exposes helpers for acquiring tokens via both common OAuth 2.0 flows so consumers don't need a separate library. All return `{ accessToken, tokenType, expiresIn, scope? }` suitable for passing into `new AirApi({ accessToken })`.
-
-### Client credentials (machine-to-machine)
-
-For server-side integrations with a confidential client.
-
-```ts
-import { AirApi, getOAuthAccessToken } from "@air/api-sdk";
-
-const { accessToken } = await getOAuthAccessToken({
-  clientId: process.env.AIR_OAUTH_CLIENT_ID!,
-  clientSecret: process.env.AIR_OAUTH_CLIENT_SECRET!,
-  tokenUrl: "https://auth.air.inc/oauth2/token",
-  scopes: ["public-api/assets.read", "public-api/boards.read"],
-});
-
-const air = new AirApi({ accessToken });
-```
+The SDK exposes helpers for the authorization_code + PKCE flow so consumers don't need a separate library. They return `{ accessToken, tokenType, expiresIn, scope?, refreshToken? }` suitable for passing into `new AirApi({ accessToken })`.
 
 ### Authorization code + PKCE (user-facing)
 
-For tools that authenticate on behalf of a human (e.g. CLI utilities, desktop apps). The three pieces compose:
+The Air Public API uses authorization_code + PKCE for both user-facing tools (CLIs, desktop apps) and confidential server integrations. The three pieces compose:
 
 ```ts
 import {
@@ -350,7 +333,7 @@ Scope handling differs by entry point: Air's `/oauth/consent` page expects bare 
 
 ### Client authentication
 
-For confidential clients (those with a `clientSecret`), both `getOAuthAccessToken` and `exchangeAuthorizationCode` accept a `clientAuthMethod` option:
+For confidential clients (those with a `clientSecret`), `exchangeAuthorizationCode` accepts a `clientAuthMethod` option:
 
 | Value               | Behavior                                                                                                                |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -360,15 +343,18 @@ For confidential clients (those with a `clientSecret`), both `getOAuthAccessToke
 Public clients (no `clientSecret`) always send `client_id` in the body and never set an `Authorization` header.
 
 ```ts
-await getOAuthAccessToken({
+await exchangeAuthorizationCode({
+  tokenUrl: "https://auth.air.inc/oauth2/token",
   clientId: "...",
   clientSecret: "...",
-  tokenUrl: "https://auth.air.inc/oauth2/token",
+  code,
+  codeVerifier,
+  redirectUri: "https://example.com/oauth/air/callback",
   clientAuthMethod: "body", // override the default
 });
 ```
 
-Errors from any of these helpers surface as the standard `APIError` subclasses (`AuthenticationError`, `BadRequestError`, etc.) and `ConnectionError` on network failures.
+Errors from these helpers surface as the standard `APIError` subclasses (`AuthenticationError`, `BadRequestError`, etc.) and `ConnectionError` on network failures.
 
 ## Pagination
 

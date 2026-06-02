@@ -21,7 +21,7 @@
 
 import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { chmod, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { config as loadEnv } from "dotenv";
 import {
@@ -131,6 +131,9 @@ async function main() {
   });
 
   const expiresAt = Date.now() + token.expiresIn * 1000;
+  // The cache holds a live bearer (and possibly refresh) token. writeFile's
+  // `mode` only applies on creation, so chmod after to also tighten existing
+  // files from prior runs.
   await writeFile(
     CACHE_PATH,
     JSON.stringify(
@@ -139,11 +142,14 @@ async function main() {
         tokenType: token.tokenType,
         expiresAt,
         scope: token.scope,
+        refreshToken: token.refreshToken,
       },
       null,
       2,
     ),
+    { mode: 0o600 },
   );
+  await chmod(CACHE_PATH, 0o600);
 
   console.log(`\n✓ Token cached to ${CACHE_PATH}`);
   console.log(`  Expires in ~${Math.round(token.expiresIn / 60)} minutes.`);

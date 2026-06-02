@@ -10,7 +10,7 @@
     "build": "echo 'Placeholder - no build'",
     "test": "echo 'Placeholder - no tests'",
     "typecheck": "tsc -b",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+    "clean": "rm -rf dist .tsc-out tsconfig.tsbuildinfo"
   },
   "license": "MIT"
 }

@@ -50,6 +50,9 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# tsc -b project-reference emit (separate from tsup's dist/ to avoid collision)
+.tsc-out/
+
 # Optional npm cache directory
 .npm
 

@@ -23,10 +23,8 @@ export type { CursorPageParams, CursorPageResponse } from "./types";
 export { VERSION } from "./version";
 
 export {
-  getOAuthAccessToken,
   buildAuthorizationUrl,
   exchangeAuthorizationCode,
-  type OAuthClientCredentialsOptions,
   type OAuthAccessToken,
   type OAuthClientAuthMethod,
   type BuildAuthorizationUrlOptions,

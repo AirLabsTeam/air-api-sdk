@@ -12,21 +12,12 @@ import { APIError, ConnectionError } from "./errors";
  */
 export type OAuthClientAuthMethod = "basic" | "body";
 
-export interface OAuthClientCredentialsOptions {
-  clientId: string;
-  clientSecret: string;
-  tokenUrl: string;
-  scopes?: string | readonly string[];
-  /** Defaults to `"basic"`. */
-  clientAuthMethod?: OAuthClientAuthMethod;
-  fetch?: typeof globalThis.fetch;
-}
-
 export interface OAuthAccessToken {
   accessToken: string;
   tokenType: string;
   expiresIn: number;
   scope?: string;
+  refreshToken?: string;
 }
 
 interface RawTokenResponse {
@@ -34,33 +25,7 @@ interface RawTokenResponse {
   token_type: string;
   expires_in: number;
   scope?: string;
-}
-
-export async function getOAuthAccessToken(
-  options: OAuthClientCredentialsOptions,
-): Promise<OAuthAccessToken> {
-  const fetchFn = options.fetch ?? globalThis.fetch;
-
-  const body = new URLSearchParams({ grant_type: "client_credentials" });
-  if (options.scopes !== undefined) {
-    const scope = Array.isArray(options.scopes)
-      ? options.scopes.join(" ")
-      : (options.scopes as string);
-    if (scope.length > 0) {
-      body.set("scope", scope);
-    }
-  }
-
-  const headers: Record<string, string> = {
-    "content-type": "application/x-www-form-urlencoded",
-  };
-  applyClientAuth(headers, body, {
-    clientId: options.clientId,
-    clientSecret: options.clientSecret,
-    method: options.clientAuthMethod ?? "basic",
-  });
-
-  return executeTokenRequest(fetchFn, options.tokenUrl, headers, body.toString());
+  refresh_token?: string;
 }
 
 export interface BuildAuthorizationUrlOptions {
@@ -179,6 +144,7 @@ async function executeTokenRequest(
     tokenType: raw.token_type,
     expiresIn: raw.expires_in,
     scope: raw.scope,
+    refreshToken: raw.refresh_token,
   };
 }
 
