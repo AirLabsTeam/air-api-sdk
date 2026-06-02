@@ -80,9 +80,7 @@ async function main(): Promise<void> {
   // `public-api/` resource-server prefix internally. We do NOT prepend
   // it here. (Direct authorization-server calls would need the prefix.)
   const scopeOverride = process.env.AIR_OAUTH_SCOPES;
-  const scopes = scopeOverride
-    ? scopeOverride.split(/\s+/).filter(Boolean)
-    : [...DEFAULT_SCOPES];
+  const scopes = scopeOverride ? scopeOverride.split(/\s+/).filter(Boolean) : [...DEFAULT_SCOPES];
 
   const redirect = new URL(redirectUri);
   const port = Number(redirect.port || (redirect.protocol === "https:" ? 443 : 80));
