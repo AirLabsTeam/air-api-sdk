@@ -20,6 +20,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      # build first so downstream packages can resolve `@air/api-core` etc.
+      # via node_modules → dist/ during typecheck and test.
+      - run: npm run build
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
