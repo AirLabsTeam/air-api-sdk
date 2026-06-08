@@ -1,6 +1,7 @@
 {
   "name": "@air/api-rest",
   "version": "0.2.0",
+  "private": true,
   "type": "module",
   "description": "Typed REST client for Air API",
   "main": "./dist/index.cjs",
