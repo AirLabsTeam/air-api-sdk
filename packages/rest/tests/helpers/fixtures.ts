@@ -2,6 +2,7 @@ import type { Asset, AssetVersion } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
 import type { Tag } from "../../src/types/tags";
 import type { CustomField } from "../../src/types/custom-fields";
+import type { Workspace } from "../../src/types/workspaces";
 
 export function makeTag(overrides: Partial<Tag> = {}): Tag {
   return {
@@ -65,6 +66,14 @@ export function makeCustomField(overrides: Partial<CustomField> = {}): CustomFie
     values: null,
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+export function makeWorkspace(overrides: Partial<Workspace> = {}): Workspace {
+  return {
+    id: "workspace-1",
+    name: "Test Workspace",
     ...overrides,
   };
 }

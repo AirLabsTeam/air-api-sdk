@@ -50,6 +50,9 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# tsc -b project-reference emit (separate from tsup's dist/ to avoid collision)
+.tsc-out/
+
 # Optional npm cache directory
 .npm
 
@@ -72,6 +75,9 @@ web_modules/
 .env
 .env.*
 !.env.example
+
+# OAuth token cache (written by scripts/get-oauth-token.mjs)
+.oauth-token-cache.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

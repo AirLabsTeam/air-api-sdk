@@ -21,3 +21,14 @@ export { isRetryableError, getRetryDelay, retryWithBackoff } from "./retry";
 export type { CursorPageParams, CursorPageResponse } from "./types";
 
 export { VERSION } from "./version";
+
+export {
+  buildAuthorizationUrl,
+  exchangeAuthorizationCode,
+  type OAuthAccessToken,
+  type OAuthClientAuthMethod,
+  type BuildAuthorizationUrlOptions,
+  type ExchangeAuthorizationCodeOptions,
+} from "./oauth";
+
+export { generatePKCEChallenge, type PKCEChallenge } from "./pkce";

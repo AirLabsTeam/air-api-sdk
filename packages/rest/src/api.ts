@@ -6,6 +6,7 @@ import { Imports } from "./resources/imports";
 import { Roles } from "./resources/roles";
 import { Tags } from "./resources/tags";
 import { Uploads } from "./resources/uploads";
+import { Workspaces } from "./resources/workspaces";
 
 export interface AirApiOptions extends AirBaseOptions {}
 
@@ -17,6 +18,7 @@ export class AirApi extends AirBase {
   readonly roles: Roles;
   readonly imports: Imports;
   readonly uploads: Uploads;
+  readonly workspaces: Workspaces;
 
   constructor(options: AirApiOptions = {}) {
     super(options);
@@ -28,5 +30,6 @@ export class AirApi extends AirBase {
     this.roles = new Roles(this);
     this.imports = new Imports(this);
     this.uploads = new Uploads(this);
+    this.workspaces = new Workspaces(this);
   }
 }

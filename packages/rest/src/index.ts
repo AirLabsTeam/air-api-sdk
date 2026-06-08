@@ -19,6 +19,14 @@ export {
   type CursorPageResponse,
   type RequestOptions,
   VERSION,
+  buildAuthorizationUrl,
+  exchangeAuthorizationCode,
+  generatePKCEChallenge,
+  type OAuthAccessToken,
+  type OAuthClientAuthMethod,
+  type BuildAuthorizationUrlOptions,
+  type ExchangeAuthorizationCodeOptions,
+  type PKCEChallenge,
 } from "@air/api-core";
 
 // Export resource classes
@@ -29,6 +37,7 @@ export { CustomFields } from "./resources/custom-fields";
 export { Roles } from "./resources/roles";
 export { Imports } from "./resources/imports";
 export { Uploads } from "./resources/uploads";
+export { Workspaces } from "./resources/workspaces";
 
 // Export all types
 export * from "./types/index";

@@ -6,5 +6,6 @@ export default defineConfig({
     include: ["tests/e2e/**/*.test.ts"],
     testTimeout: 60_000,
     hookTimeout: 30_000,
+    globalSetup: ["./tests/e2e/helpers/global-setup.ts"],
   },
 });
