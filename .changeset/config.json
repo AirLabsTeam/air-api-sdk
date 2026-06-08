@@ -2,10 +2,10 @@
   "$schema": "https://github.com/changesets/changesets/blob/main/packages/config/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [],
+  "fixed": [["@air/api-rest", "@air/api-sdk"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@air/api-webhooks", "@air/api-core", "@air/api-rest"]
+  "ignore": ["@air/api-webhooks", "@air/api-core"]
 }

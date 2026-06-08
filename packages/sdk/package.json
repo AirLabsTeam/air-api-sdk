@@ -28,8 +28,7 @@
     "typecheck": "tsc -b",
     "clean": "rm -rf dist .tsc-out tsconfig.tsbuildinfo"
   },
-  "devDependencies": {
-    "@air/api-core": "0.2.0",
+  "dependencies": {
     "@air/api-rest": "0.2.0"
   },
   "engines": {
