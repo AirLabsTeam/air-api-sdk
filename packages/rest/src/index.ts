@@ -32,6 +32,7 @@ export {
 // Export resource classes
 export { Assets } from "./resources/assets";
 export { Boards } from "./resources/boards";
+export { Libraries } from "./resources/libraries";
 export { Tags } from "./resources/tags";
 export { CustomFields } from "./resources/custom-fields";
 export { Roles } from "./resources/roles";

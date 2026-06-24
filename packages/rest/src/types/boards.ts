@@ -15,6 +15,17 @@ export interface BoardListParams extends CursorPageParams {
   name?: string;
   parentBoardId?: string;
   customField?: string | string[];
+  /**
+   * Only return boards in this library. Mutually exclusive with
+   * `inGeneralLibrary` — passing both results in a `400` (BadRequestError).
+   */
+  libraryId?: string;
+  /**
+   * Only return boards in the General library (boards not in any real library).
+   * Mutually exclusive with `libraryId` — passing both results in a `400`
+   * (BadRequestError).
+   */
+  inGeneralLibrary?: boolean;
 }
 
 export interface BoardCreateParams {

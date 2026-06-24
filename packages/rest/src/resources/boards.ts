@@ -22,6 +22,8 @@ export class Boards {
       cursor: params.cursor,
       name: params.name,
       parentBoardId: params.parentBoardId,
+      libraryId: params.libraryId,
+      inGeneralLibrary: params.inGeneralLibrary,
     };
 
     if (params.customField) {
