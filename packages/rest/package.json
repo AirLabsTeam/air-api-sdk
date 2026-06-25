@@ -24,7 +24,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsup",
-    "test": "vitest run",
+    "test": "vitest run --root ../.. --project @air/api-rest",
     "typecheck": "tsc -b",
     "clean": "rm -rf dist .tsc-out tsconfig.tsbuildinfo"
   },
