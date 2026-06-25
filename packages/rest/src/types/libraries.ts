@@ -25,7 +25,8 @@ export interface LibraryCreateParams {
 
 export interface LibraryUpdateParams {
   title?: string;
-  description?: string;
+  // Pass `null` to clear the description; omit it to leave the value unchanged.
+  description?: string | null;
   accessibility?: "public" | "private";
   visibility?: "workspaceMembers" | "libraryMembers";
 }

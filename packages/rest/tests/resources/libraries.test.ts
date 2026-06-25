@@ -54,6 +54,15 @@ describe("Libraries", () => {
     expect(body.title).toBe("Renamed");
   });
 
+  test("update forwards a null description to clear the field", async () => {
+    const mockFetch = createMockFetch({ status: 204 });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.libraries.update("library-1", { description: null });
+    const body = JSON.parse(mockFetch.calls[0].init?.body as string);
+    expect(body.description).toBeNull();
+  });
+
   test("delete sends DELETE", async () => {
     const mockFetch = createMockFetch({ status: 204 });
     const client = new AirApi(createClientOptions(mockFetch));
