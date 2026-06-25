@@ -13,6 +13,22 @@ describe("Boards", () => {
     expect(page.data).toEqual([board]);
   });
 
+  test("list forwards the libraryId filter", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.boards.list({ libraryId: "lib-1" });
+    expect(mockFetch.calls[0].url).toContain("libraryId=lib-1");
+  });
+
+  test("list forwards the inGeneralLibrary filter", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.boards.list({ inGeneralLibrary: true });
+    expect(mockFetch.calls[0].url).toContain("inGeneralLibrary=true");
+  });
+
   test("get returns a board", async () => {
     const board = makeBoard({ id: "board-123" });
     const mockFetch = createMockFetch({ body: board });

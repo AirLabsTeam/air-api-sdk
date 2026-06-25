@@ -1,5 +1,6 @@
 import type { Asset, AssetVersion } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
+import type { Library } from "../../src/types/libraries";
 import type { Tag } from "../../src/types/tags";
 import type { CustomField } from "../../src/types/custom-fields";
 import type { Workspace } from "../../src/types/workspaces";
@@ -21,6 +22,18 @@ export function makeBoard(overrides: Partial<Board> = {}): Board {
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
     customFields: undefined,
+    ...overrides,
+  };
+}
+
+export function makeLibrary(overrides: Partial<Library> = {}): Library {
+  return {
+    id: "library-1",
+    title: "Test Library",
+    accessibility: "private",
+    visibility: "workspaceMembers",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
     ...overrides,
   };
 }
