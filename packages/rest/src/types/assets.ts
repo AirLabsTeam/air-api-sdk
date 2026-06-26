@@ -83,7 +83,9 @@ export interface CdnLink {
   versionId?: string;
 }
 
-export type AssetCdnLinkCreateParams = { followsDefaultVersion: true } | { versionId: string };
+export type AssetCdnLinkCreateParams =
+  | { followsDefaultVersion: true; versionId?: never }
+  | { versionId: string; followsDefaultVersion?: never };
 
 export interface AssetCdnLinkUpdateParams {
   active: boolean;
