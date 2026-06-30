@@ -72,16 +72,18 @@ export interface AssetVersionDownloadUrl {
   url: string;
 }
 
-export interface CdnLink {
+interface CdnLinkBase {
   id: string;
   url: string;
   assetId: string;
-  followsDefaultVersion: boolean;
   active: boolean;
   createdAt: string;
   updatedAt: string;
-  versionId?: string;
 }
+
+export type CdnLink =
+  | (CdnLinkBase & { followsDefaultVersion: true; versionId?: never })
+  | (CdnLinkBase & { followsDefaultVersion: false; versionId: string });
 
 export type AssetCdnLinkCreateParams =
   | { followsDefaultVersion: true; versionId?: never }
