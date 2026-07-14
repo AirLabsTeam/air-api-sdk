@@ -1,6 +1,6 @@
 {
   "name": "@air/api-sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Air API SDK - complete SDK for the Air.inc API",
   "main": "./dist/index.cjs",
@@ -29,8 +29,8 @@
     "clean": "rm -rf dist .tsc-out tsconfig.tsbuildinfo"
   },
   "dependencies": {
-    "@air/api-core": "0.2.0",
-    "@air/api-rest": "0.2.0"
+    "@air/api-core": "0.3.0",
+    "@air/api-rest": "0.3.0"
   },
   "engines": {
     "node": ">=18"
