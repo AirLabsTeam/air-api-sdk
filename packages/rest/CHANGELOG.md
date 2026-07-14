@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.3.0
+
+### Minor Changes
+
+- 105cc08: Add Libraries resource (list/get/create/update/delete) and `libraryId` / `inGeneralLibrary` filters on the Boards list method. Supplying both filters returns 400. Library `description` accepts `null` on update to clear the field.
+
+### Patch Changes
+
+- @air/api-core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
