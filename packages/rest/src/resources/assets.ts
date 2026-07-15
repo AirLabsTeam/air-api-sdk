@@ -4,11 +4,15 @@ import type {
   AddVersionTagParams,
   Asset,
   AssetBoardListParams,
+  AssetCdnLinkCreateParams,
+  AssetCdnLinkListResponse,
+  AssetCdnLinkUpdateParams,
   AssetListParams,
   AssetVersion,
   AssetVersionDownloadUrl,
   AssetVersionListResponse,
   AssetVersionUpdateParams,
+  CdnLink,
   SetCustomFieldParams,
 } from "../types/assets";
 
@@ -57,6 +61,33 @@ export class Assets {
     return this.client.request<void>({
       method: "DELETE",
       path: `/assets/${assetId}`,
+    });
+  }
+
+  async listCdnLinks(assetId: string): Promise<AssetCdnLinkListResponse> {
+    return this.client.request<AssetCdnLinkListResponse>({
+      method: "GET",
+      path: `/assets/${assetId}/cdnLinks`,
+    });
+  }
+
+  async createCdnLink(assetId: string, params: AssetCdnLinkCreateParams): Promise<CdnLink> {
+    return this.client.request<CdnLink>({
+      method: "POST",
+      path: `/assets/${assetId}/cdnLinks`,
+      body: params,
+    });
+  }
+
+  async updateCdnLink(
+    assetId: string,
+    cdnLinkId: string,
+    params: AssetCdnLinkUpdateParams,
+  ): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: `/assets/${assetId}/cdnLinks/${cdnLinkId}`,
+      body: params,
     });
   }
 

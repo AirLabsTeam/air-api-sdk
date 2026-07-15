@@ -72,6 +72,31 @@ export interface AssetVersionDownloadUrl {
   url: string;
 }
 
+interface CdnLinkBase {
+  id: string;
+  url: string;
+  assetId: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CdnLink =
+  | (CdnLinkBase & { followsDefaultVersion: true; versionId?: never })
+  | (CdnLinkBase & { followsDefaultVersion: false; versionId: string });
+
+export type AssetCdnLinkCreateParams =
+  | { followsDefaultVersion: true; versionId?: never }
+  | { versionId: string; followsDefaultVersion?: never };
+
+export interface AssetCdnLinkUpdateParams {
+  active: boolean;
+}
+
+export interface AssetCdnLinkListResponse {
+  data: CdnLink[];
+}
+
 export interface AssetBoardListParams extends CursorPageParams {
   includeCustomFields?: boolean;
 }

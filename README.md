@@ -164,6 +164,23 @@ await air.assets.setCustomField("asset-id", "cf-id", { values: [{ id: "value-id"
 
 // List boards an asset belongs to
 const boards = await air.assets.listBoards("asset-id");
+
+// CDN links
+const { data: cdnLinks } = await air.assets.listCdnLinks("asset-id");
+
+const evergreenLink = await air.assets.createCdnLink("asset-id", {
+  followsDefaultVersion: true,
+});
+
+const versionPinnedLink = await air.assets.createCdnLink("asset-id", {
+  versionId: "version-id",
+});
+
+await air.assets.updateCdnLink("asset-id", evergreenLink.id, { active: false });
+await air.assets.updateCdnLink("asset-id", evergreenLink.id, { active: true });
+
+// If create returns a 409 Conflict, list existing CDN links to recover the URL.
+const existingLink = cdnLinks.find((link) => link.followsDefaultVersion);
 ```
 
 ### Asset versions
