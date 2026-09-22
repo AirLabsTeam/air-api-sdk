@@ -50,6 +50,13 @@ export interface AssetListParams extends CursorPageParams {
   tag?: string | string[];
   customField?: string | string[];
   search?: string;
+  /**
+   * When true, `search` is used for semantic search via AI embeddings.
+   * Requires a non-blank `search` value and Semantic Search enabled on the workspace.
+   * Returns a single page of results ordered by relevance. Combining with `tag`,
+   * `customField`, `createdAt`, or `cursor` is rejected by the API with 400.
+   */
+  semantic?: boolean;
   "createdAt[gte]"?: string;
   "createdAt[lte]"?: string;
 }

@@ -27,6 +27,10 @@ export class Assets {
       query.includeNestedAssets = params.includeNestedAssets;
     }
 
+    if (params.semantic !== undefined) {
+      query.semantic = params.semantic;
+    }
+
     if (params.tag) {
       query.tag = params.tag;
     }
