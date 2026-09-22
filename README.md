@@ -153,6 +153,7 @@ await air.boards.removeGuest(board.id, guest.id);
 // List assets (supports filtering by board, tags, custom fields, search, date range)
 const page = await air.assets.list({ parentBoardId: "board-id", limit: 20 });
 const searched = await air.assets.list({ search: "logo" });
+const semantic = await air.assets.list({ search: "sunset over water", semantic: true });
 
 // Get and delete
 const asset = await air.assets.get("asset-id");

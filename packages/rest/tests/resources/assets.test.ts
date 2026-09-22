@@ -26,6 +26,17 @@ describe("Assets", () => {
     expect(url).toContain("parentBoardId=board-1");
     expect(url).toContain("search=photo");
     expect(url).toContain("createdAt%5Bgte%5D=2024-01-01");
+    expect(url).not.toContain("semantic=");
+  });
+
+  test("list passes semantic search flag", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.list({ search: "sunset over water", semantic: true });
+    const url = mockFetch.calls[0].url;
+    expect(url).toContain("search=sunset+over+water");
+    expect(url).toContain("semantic=true");
   });
 
   test("get returns an asset", async () => {
