@@ -1,6 +1,6 @@
 {
   "name": "@air/api-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Core HTTP engine for Air API SDK",
   "main": "./dist/index.cjs",

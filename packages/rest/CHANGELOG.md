@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.4.0
+
+### Minor Changes
+
+- df6ba99: Expose the `semantic` query flag on `assets.list()` so `GET /assets` can run semantic search when `search` is provided.
+
+### Patch Changes
+
+- @air/api-core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
