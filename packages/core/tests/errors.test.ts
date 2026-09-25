@@ -57,6 +57,43 @@ describe("APIError", () => {
     expect((error as RateLimitError).retryAfter).toBe(30);
   });
 
+  test("fromResponse parses an HTTP-date Retry-After into seconds", async () => {
+    const response = new Response(JSON.stringify({ message: "Rate limited" }), {
+      status: 429,
+      headers: { "retry-after": new Date(Date.now() + 30_000).toUTCString() },
+    });
+    const error = await APIError.fromResponse(response);
+    expect((error as RateLimitError).retryAfter).toBeGreaterThanOrEqual(28);
+    expect((error as RateLimitError).retryAfter).toBeLessThanOrEqual(30);
+  });
+
+  test("fromResponse clamps an HTTP-date Retry-After in the past to 0", async () => {
+    const response = new Response(JSON.stringify({ message: "Rate limited" }), {
+      status: 429,
+      headers: { "retry-after": new Date(Date.now() - 30_000).toUTCString() },
+    });
+    const error = await APIError.fromResponse(response);
+    expect((error as RateLimitError).retryAfter).toBe(0);
+  });
+
+  test("fromResponse clamps a negative Retry-After to 0", async () => {
+    const response = new Response(JSON.stringify({ message: "Rate limited" }), {
+      status: 429,
+      headers: { "retry-after": "-5" },
+    });
+    const error = await APIError.fromResponse(response);
+    expect((error as RateLimitError).retryAfter).toBe(0);
+  });
+
+  test("fromResponse leaves retryAfter null for an unparseable Retry-After", async () => {
+    const response = new Response(JSON.stringify({ message: "Rate limited" }), {
+      status: 429,
+      headers: { "retry-after": "later" },
+    });
+    const error = await APIError.fromResponse(response);
+    expect((error as RateLimitError).retryAfter).toBeNull();
+  });
+
   test("fromResponse creates InternalServerError for 500", async () => {
     const response = new Response(JSON.stringify({ message: "Server error" }), {
       status: 500,
