@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.5.0
+
+### Minor Changes
+
+- 5a9b6ce: Add typed asset CDN link lifecycle helpers: `listCdnLinks`, `createCdnLink`, and `updateCdnLink`.
+
+### Patch Changes
+
+- @air/api-core@0.5.0
+
 ## 0.4.0
 
 ### Minor Changes
