@@ -87,3 +87,28 @@ export interface AssetVersionListResponse {
   data: AssetVersion[];
   total: number;
 }
+
+export interface CdnLink {
+  id: string;
+  url: string;
+  assetId: string;
+  followsDefaultVersion: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  /** Set when the link is pinned to a version. Omitted for links that follow the default version. */
+  versionId?: string;
+}
+
+export interface CdnLinkListResponse {
+  data: CdnLink[];
+}
+
+/**
+ * Exactly one shape. The API rejects a body that sets both fields or neither.
+ */
+export type CreateCdnLinkParams = { followsDefaultVersion: true } | { versionId: string };
+
+export interface UpdateCdnLinkParams {
+  active: boolean;
+}

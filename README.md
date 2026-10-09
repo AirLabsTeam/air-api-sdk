@@ -167,6 +167,8 @@ await air.assets.setCustomField("asset-id", "cf-id", { values: [{ id: "value-id"
 const boards = await air.assets.listBoards("asset-id");
 ```
 
+CDN link create, list, and update methods are documented under [CDN links](#cdn-links).
+
 ### Asset versions
 
 ```ts
@@ -180,6 +182,22 @@ const { url } = await air.assets.getVersionDownloadUrl("asset-id", "version-id")
 // Version tags
 await air.assets.addVersionTag("asset-id", "version-id", { id: "tag-id" });
 await air.assets.removeVersionTag("asset-id", "version-id", "tag-id");
+```
+
+### CDN links
+
+```ts
+const { data: links } = await air.assets.listCdnLinks("asset-id");
+
+// Follows the asset's default version
+const evergreen = await air.assets.createCdnLink("asset-id", { followsDefaultVersion: true });
+
+// Pinned to one version
+const pinned = await air.assets.createCdnLink("asset-id", { versionId: "version-id" });
+
+// 204 No Content
+await air.assets.updateCdnLink("asset-id", evergreen.id, { active: false });
+await air.assets.updateCdnLink("asset-id", pinned.id, { active: true });
 ```
 
 ### Tags

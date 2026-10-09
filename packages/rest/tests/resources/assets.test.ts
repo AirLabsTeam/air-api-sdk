@@ -1,7 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { AirApi } from "../../src/api";
 import { createMockFetch, createClientOptions } from "../helpers/mock-fetch";
-import { makeAsset, makeAssetVersion, makePaginatedResponse } from "../helpers/fixtures";
+import {
+  makeAsset,
+  makeAssetVersion,
+  makeCdnLink,
+  makePaginatedResponse,
+} from "../helpers/fixtures";
 
 describe("Assets", () => {
   test("list returns paginated assets", async () => {
@@ -118,5 +123,69 @@ describe("Assets", () => {
     await client.assets.removeVersionTag("asset-1", "v1", "tag-1");
     expect(mockFetch.calls[0].url).toContain("/assets/asset-1/versions/v1/tags/tag-1");
     expect(mockFetch.calls[0].init?.method).toBe("DELETE");
+  });
+
+  test("listCdnLinks returns CDN links", async () => {
+    const evergreen = makeCdnLink();
+    const pinned = makeCdnLink({
+      id: "cdn-link-2",
+      followsDefaultVersion: false,
+      versionId: "version-1",
+    });
+    const mockFetch = createMockFetch({ body: { data: [evergreen, pinned] } });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.listCdnLinks("asset-1");
+    expect(result.data).toEqual([evergreen, pinned]);
+    expect(result.data[0].versionId).toBeUndefined();
+    expect(result.data[1].versionId).toBe("version-1");
+    expect(mockFetch.calls[0].init?.method).toBe("GET");
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLinks");
+  });
+
+  test("createCdnLink posts an evergreen link", async () => {
+    const link = makeCdnLink();
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createCdnLink("asset-1", { followsDefaultVersion: true });
+    expect(result).toEqual(link);
+    expect(mockFetch.calls[0].init?.method).toBe("POST");
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLinks");
+    const body = JSON.parse(mockFetch.calls[0].init?.body as string);
+    expect(body).toEqual({ followsDefaultVersion: true });
+  });
+
+  test("createCdnLink posts a version-pinned link", async () => {
+    const link = makeCdnLink({
+      followsDefaultVersion: false,
+      versionId: "version-1",
+    });
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createCdnLink("asset-1", { versionId: "version-1" });
+    expect(result).toEqual(link);
+    const body = JSON.parse(mockFetch.calls[0].init?.body as string);
+    expect(body).toEqual({ versionId: "version-1" });
+  });
+
+  test("updateCdnLink sends PATCH and returns void", async () => {
+    const mockFetch = createMockFetch([{ status: 204 }, { status: 204 }]);
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const deactivated = await client.assets.updateCdnLink("asset-1", "cdn-link-1", {
+      active: false,
+    });
+    expect(deactivated).toBeUndefined();
+    expect(mockFetch.calls[0].init?.method).toBe("PATCH");
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLinks/cdn-link-1");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({ active: false });
+
+    const reactivated = await client.assets.updateCdnLink("asset-1", "cdn-link-1", {
+      active: true,
+    });
+    expect(reactivated).toBeUndefined();
+    expect(JSON.parse(mockFetch.calls[1].init?.body as string)).toEqual({ active: true });
   });
 });
