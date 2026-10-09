@@ -166,6 +166,22 @@ describe("retryWithBackoff", () => {
     expect(calls).toBe(2);
   });
 
+  test("waits for an HTTP-date Retry-After before retrying", async () => {
+    const headers = new Headers({ "retry-after": new Date(Date.now() + 1000).toUTCString() });
+    let calls = 0;
+    const started = Date.now();
+    const result = await retryWithBackoff(async () => {
+      calls++;
+      if (calls < 2) {
+        throw new RateLimitError(429, {}, "rate limited", headers);
+      }
+      return "ok";
+    }, 1);
+    expect(result).toBe("ok");
+    expect(calls).toBe(2);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(900);
+  });
+
   test("does not retry POST on 5xx errors", async () => {
     let calls = 0;
     try {
@@ -192,5 +208,23 @@ describe("getRetryDelay", () => {
     // retryAfter is 2s = 2000ms, jitter adds up to 20% = 400ms
     expect(delay).toBeGreaterThanOrEqual(2000);
     expect(delay).toBeLessThanOrEqual(2400);
+  });
+
+  test("honors an HTTP-date Retry-After header value", () => {
+    const headers = new Headers({ "retry-after": new Date(Date.now() + 2000).toUTCString() });
+    const err = new RateLimitError(429, {}, "rate limited", headers);
+    const delay = getRetryDelay(err, 0);
+    // ~2s from the header, jitter adds up to 20%
+    expect(delay).toBeGreaterThanOrEqual(1000);
+    expect(delay).toBeLessThanOrEqual(2400);
+  });
+
+  test("falls back to exponential backoff for an unparseable Retry-After", () => {
+    const headers = new Headers({ "retry-after": "later" });
+    const err = new RateLimitError(429, {}, "rate limited", headers);
+    const delay = getRetryDelay(err, 1);
+    // 500ms base * 2^1 = 1000ms, jitter adds up to 20%
+    expect(delay).toBeGreaterThanOrEqual(1000);
+    expect(delay).toBeLessThanOrEqual(1200);
   });
 });

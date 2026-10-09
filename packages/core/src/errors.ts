@@ -83,8 +83,7 @@ export class RateLimitError extends APIError {
   constructor(status: number, body: unknown, message: string, headers: Headers) {
     super(status, body, message, headers);
     this.name = "RateLimitError";
-    const retryAfterHeader = headers.get("retry-after");
-    this.retryAfter = retryAfterHeader ? Number(retryAfterHeader) : null;
+    this.retryAfter = parseRetryAfter(headers.get("retry-after"));
   }
 }
 
@@ -107,4 +106,19 @@ export class TimeoutError extends ConnectionError {
     super(message);
     this.name = "TimeoutError";
   }
+}
+
+// RFC 9110 §10.2.3 allows either delay-seconds or an HTTP-date, so both are
+// normalized to seconds here; an unparseable value yields null so callers fall
+// back to exponential backoff rather than to a NaN delay.
+function parseRetryAfter(header: string | null): number | null {
+  if (!header) return null;
+
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) return Math.max(0, seconds);
+
+  const retryAt = Date.parse(header);
+  if (Number.isNaN(retryAt)) return null;
+
+  return Math.max(0, Math.ceil((retryAt - Date.now()) / 1000));
 }
