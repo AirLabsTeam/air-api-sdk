@@ -126,12 +126,19 @@ describe("Assets", () => {
   });
 
   test("listCdnLinks returns CDN links", async () => {
-    const link = makeCdnLink();
-    const mockFetch = createMockFetch({ body: { data: [link] } });
+    const evergreen = makeCdnLink();
+    const pinned = makeCdnLink({
+      id: "cdn-link-2",
+      followsDefaultVersion: false,
+      versionId: "version-1",
+    });
+    const mockFetch = createMockFetch({ body: { data: [evergreen, pinned] } });
     const client = new AirApi(createClientOptions(mockFetch));
 
     const result = await client.assets.listCdnLinks("asset-1");
-    expect(result.data).toEqual([link]);
+    expect(result.data).toEqual([evergreen, pinned]);
+    expect(result.data[0].versionId).toBeUndefined();
+    expect(result.data[1].versionId).toBe("version-1");
     expect(mockFetch.calls[0].init?.method).toBe("GET");
     expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLinks");
   });
@@ -164,14 +171,21 @@ describe("Assets", () => {
   });
 
   test("updateCdnLink sends PATCH and returns void", async () => {
-    const mockFetch = createMockFetch({ status: 204 });
+    const mockFetch = createMockFetch([{ status: 204 }, { status: 204 }]);
     const client = new AirApi(createClientOptions(mockFetch));
 
-    const result = await client.assets.updateCdnLink("asset-1", "cdn-link-1", { active: false });
-    expect(result).toBeUndefined();
+    const deactivated = await client.assets.updateCdnLink("asset-1", "cdn-link-1", {
+      active: false,
+    });
+    expect(deactivated).toBeUndefined();
     expect(mockFetch.calls[0].init?.method).toBe("PATCH");
     expect(mockFetch.calls[0].url).toContain("/assets/asset-1/cdnLinks/cdn-link-1");
-    const body = JSON.parse(mockFetch.calls[0].init?.body as string);
-    expect(body).toEqual({ active: false });
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({ active: false });
+
+    const reactivated = await client.assets.updateCdnLink("asset-1", "cdn-link-1", {
+      active: true,
+    });
+    expect(reactivated).toBeUndefined();
+    expect(JSON.parse(mockFetch.calls[1].init?.body as string)).toEqual({ active: true });
   });
 });

@@ -167,6 +167,8 @@ await air.assets.setCustomField("asset-id", "cf-id", { values: [{ id: "value-id"
 const boards = await air.assets.listBoards("asset-id");
 ```
 
+CDN link create, list, and update methods are documented under [CDN links](#cdn-links).
+
 ### Asset versions
 
 ```ts
