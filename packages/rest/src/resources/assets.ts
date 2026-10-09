@@ -9,7 +9,11 @@ import type {
   AssetVersionDownloadUrl,
   AssetVersionListResponse,
   AssetVersionUpdateParams,
+  CdnLink,
+  CdnLinkListResponse,
+  CreateCdnLinkParams,
   SetCustomFieldParams,
+  UpdateCdnLinkParams,
 } from "../types/assets";
 
 export class Assets {
@@ -145,5 +149,32 @@ export class Assets {
       { method: "GET", path: `/assets/${assetId}/boards`, query },
       query,
     );
+  }
+
+  async listCdnLinks(assetId: string): Promise<CdnLinkListResponse> {
+    return this.client.request<CdnLinkListResponse>({
+      method: "GET",
+      path: `/assets/${assetId}/cdnLinks`,
+    });
+  }
+
+  async createCdnLink(assetId: string, params: CreateCdnLinkParams): Promise<CdnLink> {
+    return this.client.request<CdnLink>({
+      method: "POST",
+      path: `/assets/${assetId}/cdnLinks`,
+      body: params,
+    });
+  }
+
+  async updateCdnLink(
+    assetId: string,
+    cdnLinkId: string,
+    params: UpdateCdnLinkParams,
+  ): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: `/assets/${assetId}/cdnLinks/${cdnLinkId}`,
+      body: params,
+    });
   }
 }
