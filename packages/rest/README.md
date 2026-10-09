@@ -21,6 +21,7 @@ npm install @air/api-rest
 ## What's included
 
 - Resource classes: `BoardsResource`, `AssetsResource`, `TagsResource`, `CustomFieldsResource`, `UploadsResource`, `ImportsResource`, `RolesResource`
+- Asset CDN link helpers: `listCdnLinks`, `createCdnLink`, and `updateCdnLink`
 - Full TypeScript types for all API request/response shapes
 - `AirApi` client class that composes all resources
 

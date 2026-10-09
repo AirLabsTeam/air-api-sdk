@@ -1,4 +1,4 @@
-import type { Asset, AssetVersion } from "../../src/types/assets";
+import type { Asset, AssetVersion, CdnLink } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
 import type { Library } from "../../src/types/libraries";
 import type { Tag } from "../../src/types/tags";
@@ -66,6 +66,19 @@ export function makeAsset(overrides: Partial<Asset> = {}): Asset {
     id: "asset-1",
     customFields: undefined,
     coverVersion: makeAssetVersion(),
+    ...overrides,
+  };
+}
+
+export function makeCdnLink(overrides: Partial<CdnLink> = {}): CdnLink {
+  return {
+    id: "cdn-link-1",
+    url: "https://cdn.example.com/cdn-link-1",
+    assetId: "asset-1",
+    followsDefaultVersion: true,
+    active: true,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
     ...overrides,
   };
 }
