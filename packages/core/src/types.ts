@@ -1,5 +1,10 @@
 export interface CursorPageParams {
   limit?: number;
+  /**
+   * Cursor from a previous list response. `null` requests the first page and
+   * is omitted from the query string, so `pagination.cursor` can be passed
+   * through directly.
+   */
   cursor?: string | null;
 }
 
