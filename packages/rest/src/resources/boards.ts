@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise } from "@air/api-core";
+import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
 import type {
   AddBoardAssetsParams,
   AddGuestParams,
@@ -17,7 +17,7 @@ export class Boards {
   constructor(private client: AirBase) {}
 
   list(params: BoardListParams = {}): PagePromise<Board> {
-    const query: Record<string, string | string[] | number | boolean | undefined> = {
+    const query: Record<string, QueryParam> = {
       limit: params.limit,
       cursor: params.cursor,
       name: params.name,

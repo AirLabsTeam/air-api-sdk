@@ -44,6 +44,35 @@ describe("Assets", () => {
     expect(url).toContain("semantic=true");
   });
 
+  test("list omits a null pagination cursor", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([makeAsset()]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.assets.list();
+    await client.assets.list({ cursor: page.pagination.cursor, limit: 10 });
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(page.pagination.cursor).toBeNull();
+    expect(url.searchParams.has("cursor")).toBe(false);
+    expect(url.searchParams.get("limit")).toBe("10");
+  });
+
+  test("getNextPage forwards the cursor string", async () => {
+    const mockFetch = createMockFetch([
+      { body: makePaginatedResponse([makeAsset({ id: "asset-1" })], true, "bnVsbA") },
+      { body: makePaginatedResponse([makeAsset({ id: "asset-2" })]) },
+    ]);
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.assets.list({ limit: 10 });
+    const next = await page.getNextPage();
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(url.searchParams.get("cursor")).toBe("bnVsbA");
+    expect(url.searchParams.get("limit")).toBe("10");
+    expect(next.data.map((asset) => asset.id)).toEqual(["asset-2"]);
+  });
+
   test("get returns an asset", async () => {
     const asset = makeAsset({ id: "asset-123" });
     const mockFetch = createMockFetch({ body: asset });

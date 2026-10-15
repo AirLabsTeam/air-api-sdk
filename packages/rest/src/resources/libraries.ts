@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise } from "@air/api-core";
+import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
 import type {
   Library,
   LibraryCreateParams,
@@ -10,7 +10,7 @@ export class Libraries {
   constructor(private client: AirBase) {}
 
   list(params: LibraryListParams = {}): PagePromise<Library> {
-    const query: Record<string, string | number | boolean | undefined> = {
+    const query: Record<string, QueryParam> = {
       limit: params.limit,
       cursor: params.cursor,
       search: params.search,
