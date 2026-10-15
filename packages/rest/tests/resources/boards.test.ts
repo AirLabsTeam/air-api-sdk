@@ -29,6 +29,35 @@ describe("Boards", () => {
     expect(mockFetch.calls[0].url).toContain("inGeneralLibrary=true");
   });
 
+  test("list omits a null pagination cursor", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([makeBoard()]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.boards.list();
+    await client.boards.list({ cursor: page.pagination.cursor, limit: 10 });
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(page.pagination.cursor).toBeNull();
+    expect(url.searchParams.has("cursor")).toBe(false);
+    expect(url.searchParams.get("limit")).toBe("10");
+  });
+
+  test("getNextPage forwards the cursor string", async () => {
+    const mockFetch = createMockFetch([
+      { body: makePaginatedResponse([makeBoard({ id: "board-1" })], true, "bnVsbA") },
+      { body: makePaginatedResponse([makeBoard({ id: "board-2" })]) },
+    ]);
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.boards.list({ limit: 10 });
+    const next = await page.getNextPage();
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(url.searchParams.get("cursor")).toBe("bnVsbA");
+    expect(url.searchParams.get("limit")).toBe("10");
+    expect(next.data.map((board) => board.id)).toEqual(["board-2"]);
+  });
+
   test("get returns a board", async () => {
     const board = makeBoard({ id: "board-123" });
     const mockFetch = createMockFetch({ body: board });
