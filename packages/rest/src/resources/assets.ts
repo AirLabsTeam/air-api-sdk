@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise } from "@air/api-core";
+import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
 import type { Board } from "../types/boards";
 import type {
   AddVersionTagParams,
@@ -20,7 +20,7 @@ export class Assets {
   constructor(private client: AirBase) {}
 
   list(params: AssetListParams = {}): PagePromise<Asset> {
-    const query: Record<string, string | string[] | number | boolean | undefined> = {
+    const query: Record<string, QueryParam> = {
       limit: params.limit,
       cursor: params.cursor,
       parentBoardId: params.parentBoardId,
@@ -163,7 +163,7 @@ export class Assets {
   }
 
   listBoards(assetId: string, params: AssetBoardListParams = {}): PagePromise<Board> {
-    const query: Record<string, string | number | boolean | undefined> = {
+    const query: Record<string, QueryParam> = {
       limit: params.limit,
       cursor: params.cursor,
     };

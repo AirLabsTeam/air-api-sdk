@@ -14,7 +14,7 @@ export {
 
 export { CursorPage, PagePromise } from "./pagination";
 
-export type { RequestOptions } from "./request-options";
+export type { QueryParam, RequestOptions } from "./request-options";
 
 export { isRetryableError, getRetryDelay, retryWithBackoff } from "./retry";
 

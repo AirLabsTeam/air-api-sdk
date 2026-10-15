@@ -1,6 +1,6 @@
 import { APIError, ConnectionError, TimeoutError } from "./errors";
 import { CursorPage, PagePromise } from "./pagination";
-import type { RequestOptions } from "./request-options";
+import type { QueryParam, RequestOptions } from "./request-options";
 import { retryWithBackoff } from "./retry";
 import type { CursorPageResponse } from "./types";
 import { VERSION } from "./version";
@@ -93,7 +93,7 @@ export class AirBase {
 
   requestCursorPage<T>(
     options: RequestOptions,
-    query?: Record<string, string | string[] | number | boolean | undefined>,
+    query?: Record<string, QueryParam>,
   ): PagePromise<T> {
     return new PagePromise<T>((resolve, reject) => {
       this.request<CursorPageResponse<T>>(options)
@@ -180,15 +180,12 @@ export class AirBase {
     return (await response.json()) as T;
   }
 
-  private _buildURL(
-    path: string,
-    query?: Record<string, string | string[] | number | boolean | undefined>,
-  ): string {
+  private _buildURL(path: string, query?: Record<string, QueryParam>): string {
     const url = new URL(`${this.baseURL}${path}`);
 
     if (query) {
       for (const [key, value] of Object.entries(query)) {
-        if (value === undefined) continue;
+        if (value === undefined || value === null) continue;
         if (Array.isArray(value)) {
           for (const v of value) {
             url.searchParams.append(key, v);

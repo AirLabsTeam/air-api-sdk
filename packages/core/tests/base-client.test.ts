@@ -123,3 +123,44 @@ describe("AirBase request headers", () => {
     expect(headers["x-air-workspace-id"]).toBe("ws");
   });
 });
+
+describe("AirBase query serialization", () => {
+  function createClient() {
+    const mockFetch = createMockFetch({ body: {} });
+    const client = new AirBase({
+      apiKey: "my-key",
+      workspaceId: "my-workspace",
+      fetch: mockFetch as unknown as typeof globalThis.fetch,
+      maxRetries: 0,
+    });
+    return { client, mockFetch };
+  }
+
+  test("omits null and undefined query values", async () => {
+    const { client, mockFetch } = createClient();
+
+    await client.request({
+      method: "GET",
+      path: "/boards",
+      query: { cursor: null, name: undefined, limit: 10 },
+    });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.searchParams.has("cursor")).toBe(false);
+    expect(url.searchParams.has("name")).toBe(false);
+    expect(url.searchParams.get("limit")).toBe("10");
+  });
+
+  test("sends a cursor string unchanged", async () => {
+    const { client, mockFetch } = createClient();
+
+    await client.request({
+      method: "GET",
+      path: "/boards",
+      query: { cursor: "bnVsbA" },
+    });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.searchParams.get("cursor")).toBe("bnVsbA");
+  });
+});

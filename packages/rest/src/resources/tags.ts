@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise } from "@air/api-core";
+import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
 import type { Tag, TagCreateParams, TagListParams, TagUpdateParams } from "../types/tags";
 
 export class Tags {
@@ -9,9 +9,9 @@ export class Tags {
       {
         method: "GET",
         path: "/tags",
-        query: params as Record<string, string | number | undefined>,
+        query: params as Record<string, QueryParam>,
       },
-      params as Record<string, string | number | undefined>,
+      params as Record<string, QueryParam>,
     );
   }
 

@@ -1,6 +1,6 @@
 export interface CursorPageParams {
   limit?: number;
-  cursor?: string;
+  cursor?: string | null;
 }
 
 export interface CursorPageResponse<T> {
