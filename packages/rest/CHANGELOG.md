@@ -1,5 +1,13 @@
 # @air/api-rest
 
+## 0.5.1
+
+### Patch Changes
+
+- 3a24cb8: Omit null pagination cursors from list query strings so a `pagination.cursor` of `null` requests the first page instead of sending `?cursor=null`.
+- Updated dependencies [3a24cb8]
+  - @air/api-core@0.5.1
+
 ## 0.5.0
 
 ### Minor Changes
