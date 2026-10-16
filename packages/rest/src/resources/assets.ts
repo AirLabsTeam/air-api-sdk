@@ -15,6 +15,7 @@ import type {
   CdnLink,
   SetCustomFieldParams,
 } from "../types/assets";
+import type { AssetShareLink, AssetShareLinkListParams } from "../types/share-links";
 
 export class Assets {
   constructor(private client: AirBase) {}
@@ -160,6 +161,21 @@ export class Assets {
       method: "DELETE",
       path: `/assets/${assetId}/versions/${versionId}/tags/${tagId}`,
     });
+  }
+
+  listShareLinks(
+    assetId: string,
+    params: AssetShareLinkListParams = {},
+  ): PagePromise<AssetShareLink> {
+    const query: Record<string, QueryParam> = {
+      limit: params.limit,
+      cursor: params.cursor,
+    };
+
+    return this.client.requestCursorPage<AssetShareLink>(
+      { method: "GET", path: `/assets/${assetId}/share-links`, query },
+      query,
+    );
   }
 
   listBoards(assetId: string, params: AssetBoardListParams = {}): PagePromise<Board> {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { AirApi } from "../../src/api";
 import { createMockFetch, createClientOptions } from "../helpers/mock-fetch";
-import { makeBoard, makePaginatedResponse } from "../helpers/fixtures";
+import { makeBoard, makePaginatedResponse, makeShareLink } from "../helpers/fixtures";
 
 describe("Boards", () => {
   test("list returns paginated boards", async () => {
@@ -104,6 +104,32 @@ describe("Boards", () => {
     await client.boards.removeAsset("board-1", "asset-1");
     expect(mockFetch.calls[0].url).toContain("/boards/board-1/assets/asset-1");
     expect(mockFetch.calls[0].init?.method).toBe("DELETE");
+  });
+
+  test("listShareLinks returns the board share link", async () => {
+    const link = makeShareLink({ hasPassword: true, expiresAt: "2026-12-31T00:00:00.000Z" });
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([link]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.listShareLinks("board-1");
+
+    expect(result.data).toEqual([link]);
+    expect(result.total).toBe(1);
+    expect(result.pagination).toEqual({ hasMore: false, cursor: null });
+    expect(mockFetch.calls[0].init?.method).toBe("GET");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/boards/board-1/share-links");
+    expect(url.search).toBe("");
+  });
+
+  test("listShareLinks returns an empty list when the board has no link", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.listShareLinks("board-1");
+
+    expect(result.data).toEqual([]);
+    expect(result.total).toBe(0);
   });
 
   test("addGuest sends POST", async () => {
