@@ -12,6 +12,7 @@ import type {
   SetBoardCustomFieldParams,
   UpdateGuestParams,
 } from "../types/boards";
+import type { BoardShareLinkListResponse } from "../types/share-links";
 
 export class Boards {
   constructor(private client: AirBase) {}
@@ -87,6 +88,13 @@ export class Boards {
       method: "PUT",
       path: `/boards/${boardId}/customFields/${customFieldId}`,
       body: params,
+    });
+  }
+
+  async listShareLinks(boardId: string): Promise<BoardShareLinkListResponse> {
+    return this.client.request<BoardShareLinkListResponse>({
+      method: "GET",
+      path: `/boards/${boardId}/share-links`,
     });
   }
 

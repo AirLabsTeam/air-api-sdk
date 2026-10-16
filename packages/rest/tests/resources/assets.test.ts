@@ -5,7 +5,9 @@ import {
   makeAsset,
   makeAssetVersion,
   makeCdnLink,
+  makeCurrentVersionShareLink,
   makePaginatedResponse,
+  makePinnedShareLink,
 } from "../helpers/fixtures";
 
 describe("Assets", () => {
@@ -152,6 +154,80 @@ describe("Assets", () => {
     expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
       active: false,
     });
+  });
+
+  test("listShareLinks returns paginated asset share links", async () => {
+    const current = makeCurrentVersionShareLink();
+    const pinned = makePinnedShareLink({ versionId: "version-2", showAllVersions: true });
+    const disabled = makeCurrentVersionShareLink({
+      id: "b2c3d4e5f",
+      url: "https://app.air.inc/a/b2c3d4e5f",
+      active: false,
+      hasPassword: true,
+    });
+    const mockFetch = createMockFetch({
+      body: makePaginatedResponse([current, pinned, disabled], false, null),
+    });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.assets.listShareLinks("asset-1");
+
+    expect(page.data).toEqual([current, pinned, disabled]);
+    expect(page.total).toBe(3);
+    expect(page.pagination).toEqual({ hasMore: false, cursor: null });
+    expect(mockFetch.calls[0].init?.method).toBe("GET");
+    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/share-links");
+    expect(new URL(mockFetch.calls[0].url).search).toBe("");
+  });
+
+  test("listShareLinks passes limit and cursor", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.listShareLinks("asset-1", { limit: 12, cursor: "bnVsbA" });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
+    expect(url.searchParams.get("limit")).toBe("12");
+    expect(url.searchParams.get("cursor")).toBe("bnVsbA");
+  });
+
+  test("listShareLinks omits a null pagination cursor", async () => {
+    const mockFetch = createMockFetch({
+      body: makePaginatedResponse([makeCurrentVersionShareLink()]),
+    });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.assets.listShareLinks("asset-1");
+    await client.assets.listShareLinks("asset-1", { cursor: page.pagination.cursor, limit: 12 });
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(page.pagination.cursor).toBeNull();
+    expect(url.searchParams.has("cursor")).toBe(false);
+    expect(url.searchParams.get("limit")).toBe("12");
+  });
+
+  test("listShareLinks getNextPage forwards the cursor string", async () => {
+    const mockFetch = createMockFetch([
+      {
+        body: makePaginatedResponse(
+          [makeCurrentVersionShareLink({ id: "a1b2c3d4e" })],
+          true,
+          "bnVsbA",
+        ),
+      },
+      { body: makePaginatedResponse([makePinnedShareLink({ id: "c3d4e5f6a" })]) },
+    ]);
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const page = await client.assets.listShareLinks("asset-1", { limit: 12 });
+    const next = await page.getNextPage();
+
+    const url = new URL(mockFetch.calls[1].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
+    expect(url.searchParams.get("cursor")).toBe("bnVsbA");
+    expect(url.searchParams.get("limit")).toBe("12");
+    expect(next.data.map((link) => link.id)).toEqual(["c3d4e5f6a"]);
   });
 
   test("listVersions returns versions", async () => {

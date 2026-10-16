@@ -1,5 +1,6 @@
 import type { Asset, AssetVersion, CdnLink } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
+import type { AssetShareLink, ShareLink } from "../../src/types/share-links";
 import type { Library } from "../../src/types/libraries";
 import type { Tag } from "../../src/types/tags";
 import type { CustomField } from "../../src/types/custom-fields";
@@ -66,6 +67,50 @@ export function makeAsset(overrides: Partial<Asset> = {}): Asset {
     id: "asset-1",
     customFields: undefined,
     coverVersion: makeAssetVersion(),
+    ...overrides,
+  };
+}
+
+export function makeShareLink(overrides: Partial<ShareLink> = {}): ShareLink {
+  return {
+    id: "a1b2c3d4e",
+    url: "https://app.air.inc/a/a1b2c3d4e",
+    active: true,
+    hasPassword: false,
+    expiresAt: null,
+    requireAccount: false,
+    allowDownload: true,
+    comments: "hidden",
+    customFields: "hidden",
+    createdAt: "2026-10-12T15:00:00.000Z",
+    ...overrides,
+  };
+}
+
+type CurrentVersionShareLink = Extract<AssetShareLink, { followsDefaultVersion: true }>;
+type PinnedShareLink = Extract<AssetShareLink, { followsDefaultVersion: false }>;
+
+export function makeCurrentVersionShareLink(
+  overrides: Partial<CurrentVersionShareLink> = {},
+): CurrentVersionShareLink {
+  return {
+    ...makeShareLink(),
+    followsDefaultVersion: true,
+    showAllVersions: false,
+    ...overrides,
+  };
+}
+
+export function makePinnedShareLink(
+  overrides: Partial<Omit<PinnedShareLink, "followsDefaultVersion" | "versionId">> & {
+    versionId?: string;
+  } = {},
+): PinnedShareLink {
+  return {
+    ...makeShareLink(),
+    followsDefaultVersion: false,
+    versionId: "version-1",
+    showAllVersions: false,
     ...overrides,
   };
 }
