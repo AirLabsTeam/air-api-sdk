@@ -136,6 +136,10 @@ await air.boards.removeAsset(board.id, "asset-id-1");
 await air.boards.setCustomField(board.id, "custom-field-id", { value: "hello" });
 await air.boards.setCustomField(board.id, "custom-field-id", { value: null }); // clear
 
+// Share links. A board has zero or one. `url` is the public share link.
+// Disabled links are included (`active: false`). The password is never returned.
+const { data: boardShareLinks } = await air.boards.listShareLinks(board.id);
+
 // Guest management
 const guest = await air.boards.addGuest(board.id, {
   email: "guest@example.com",
@@ -182,6 +186,12 @@ await air.assets.updateCdnLink("asset-id", evergreenLink.id, { active: true });
 
 // If create returns a 409 Conflict, list existing CDN links to recover the URL.
 const existingLink = cdnLinks.find((link) => link.followsDefaultVersion);
+
+// Share links. `url` is the public share link, separate from CDN links.
+// An asset can have one link that follows the current version and one per pinned version.
+// Disabled links are included (`active: false`). The password is never returned.
+const shareLinks = await air.assets.listShareLinks("asset-id", { limit: 12 });
+const current = shareLinks.data.find((link) => link.followsDefaultVersion);
 ```
 
 ### Asset versions
