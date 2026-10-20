@@ -169,7 +169,8 @@ describe("Assets", () => {
 
     expect(result).toEqual(link);
     expect(mockFetch.calls[0].init?.method).toBe("POST");
-    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/share-links");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
     expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
       followsDefaultVersion: true,
       allowDownload: false,
@@ -189,7 +190,8 @@ describe("Assets", () => {
 
     expect(result).toEqual(link);
     expect(mockFetch.calls[0].init?.method).toBe("POST");
-    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/share-links");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
     expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
       versionId: "version-1",
       active: true,
@@ -207,7 +209,8 @@ describe("Assets", () => {
 
     expect(result).toBeUndefined();
     expect(mockFetch.calls[0].init?.method).toBe("PATCH");
-    expect(mockFetch.calls[0].url).toContain("/assets/asset-1/share-links/a1b2c3d4e");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links/a1b2c3d4e");
     expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
       active: false,
       showAllVersions: true,

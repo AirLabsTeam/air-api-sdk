@@ -197,8 +197,9 @@ const existingLink = cdnLinks.find((link) => link.followsDefaultVersion);
 // Share links. `url` is the public share link, separate from CDN links.
 // An asset can have one link that follows the current version and one per pinned version.
 // Disabled links are included (`active: false`). The password is never returned.
-// A 409 Conflict means that link already exists, including a disabled one.
 const shareLinks = await air.assets.listShareLinks("asset-id", { limit: 12 });
+// If create returns a 409 Conflict, that link already exists (including a
+// disabled one). Use the listed link, then update it.
 const current = shareLinks.data.find((link) => link.followsDefaultVersion);
 
 // Exactly one of `followsDefaultVersion: true` or `versionId`. A pinned link
