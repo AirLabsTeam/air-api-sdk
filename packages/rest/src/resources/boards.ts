@@ -12,7 +12,12 @@ import type {
   SetBoardCustomFieldParams,
   UpdateGuestParams,
 } from "../types/boards";
-import type { BoardShareLinkListResponse } from "../types/share-links";
+import type {
+  BoardShareLink,
+  BoardShareLinkCreateParams,
+  BoardShareLinkListResponse,
+  BoardShareLinkUpdateParams,
+} from "../types/share-links";
 
 export class Boards {
   constructor(private client: AirBase) {}
@@ -95,6 +100,29 @@ export class Boards {
     return this.client.request<BoardShareLinkListResponse>({
       method: "GET",
       path: `/boards/${boardId}/share-links`,
+    });
+  }
+
+  async createShareLink(
+    boardId: string,
+    params: BoardShareLinkCreateParams = {},
+  ): Promise<BoardShareLink> {
+    return this.client.request<BoardShareLink>({
+      method: "POST",
+      path: `/boards/${boardId}/share-links`,
+      body: params,
+    });
+  }
+
+  async updateShareLink(
+    boardId: string,
+    shareLinkId: string,
+    params: BoardShareLinkUpdateParams,
+  ): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: `/boards/${boardId}/share-links/${shareLinkId}`,
+      body: params,
     });
   }
 

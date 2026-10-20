@@ -58,3 +58,37 @@ export type AssetShareLinkListParams = CursorPageParams;
 export interface BoardShareLinkListResponse extends CursorPageResponse<BoardShareLink> {
   total: number;
 }
+
+/**
+ * Settings accepted on share-link create and update.
+ * Omitted fields follow the workspace Share Link Defaults on create,
+ * and stay unchanged on update.
+ */
+export interface ShareLinkWriteSettings {
+  active?: boolean;
+  allowDownload?: boolean;
+}
+
+/** Asset links also accept `showAllVersions`. */
+export interface AssetShareLinkWriteSettings extends ShareLinkWriteSettings {
+  showAllVersions?: boolean;
+}
+
+/**
+ * Body for `POST /assets/:assetId/share-links`.
+ * Exactly one of `followsDefaultVersion: true` or `versionId`.
+ */
+export type AssetShareLinkCreateParams = AssetShareLinkWriteSettings &
+  (
+    | { followsDefaultVersion: true; versionId?: never }
+    | { versionId: string; followsDefaultVersion?: never }
+  );
+
+/** Body for `PATCH /assets/:assetId/share-links/:shareLinkId`. */
+export type AssetShareLinkUpdateParams = AssetShareLinkWriteSettings;
+
+/** Body for `POST /boards/:boardId/share-links`. */
+export type BoardShareLinkCreateParams = ShareLinkWriteSettings;
+
+/** Body for `PATCH /boards/:boardId/share-links/:shareLinkId`. */
+export type BoardShareLinkUpdateParams = ShareLinkWriteSettings;

@@ -22,7 +22,7 @@ npm install @air/api-rest
 
 - Resource classes: `BoardsResource`, `AssetsResource`, `TagsResource`, `CustomFieldsResource`, `UploadsResource`, `ImportsResource`, `RolesResource`
 - Asset CDN link helpers: `listCdnLinks`, `createCdnLink`, and `updateCdnLink`
-- Share link reads: `assets.listShareLinks` and `boards.listShareLinks`
+- Share links: `listShareLinks`, `createShareLink`, and `updateShareLink` on assets and boards
 - Full TypeScript types for all API request/response shapes
 - `AirApi` client class that composes all resources
 

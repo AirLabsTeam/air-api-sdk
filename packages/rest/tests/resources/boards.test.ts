@@ -106,6 +106,52 @@ describe("Boards", () => {
     expect(mockFetch.calls[0].init?.method).toBe("DELETE");
   });
 
+  test("createShareLink creates a board share link", async () => {
+    const link = makeShareLink({ allowDownload: false });
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.createShareLink("board-1", { allowDownload: false });
+
+    expect(result).toEqual(link);
+    expect(mockFetch.calls[0].init?.method).toBe("POST");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/boards/board-1/share-links");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      allowDownload: false,
+    });
+  });
+
+  test("createShareLink sends an empty body when settings are omitted", async () => {
+    const link = makeShareLink();
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.createShareLink("board-1");
+
+    expect(result).toEqual(link);
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({});
+  });
+
+  test("updateShareLink sends PATCH and returns void", async () => {
+    const mockFetch = createMockFetch({ status: 204 });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.updateShareLink("board-1", "a1b2c3d4e", {
+      active: true,
+      allowDownload: false,
+    });
+
+    expect(result).toBeUndefined();
+    expect(mockFetch.calls[0].init?.method).toBe("PATCH");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/boards/board-1/share-links/a1b2c3d4e");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      active: true,
+      allowDownload: false,
+    });
+  });
+
   test("listShareLinks returns the board share link", async () => {
     const link = makeShareLink({ hasPassword: true, expiresAt: "2026-12-31T00:00:00.000Z" });
     const mockFetch = createMockFetch({ body: makePaginatedResponse([link]) });
