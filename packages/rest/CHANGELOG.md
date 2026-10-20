@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.6.0
+
+### Minor Changes
+
+- 5ab0241: Add `assets.listShareLinks` and `boards.listShareLinks` for reading public share links (`GET /assets/{assetId}/share-links`, `GET /boards/{boardId}/share-links`).
+
+### Patch Changes
+
+- @air/api-core@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes
