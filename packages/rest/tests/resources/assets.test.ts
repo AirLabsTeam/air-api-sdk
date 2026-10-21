@@ -156,6 +156,67 @@ describe("Assets", () => {
     });
   });
 
+  test("createShareLink creates a current-version share link", async () => {
+    const link = makeCurrentVersionShareLink({ showAllVersions: true, allowDownload: false });
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createShareLink("asset-1", {
+      followsDefaultVersion: true,
+      allowDownload: false,
+      showAllVersions: true,
+    });
+
+    expect(result).toEqual(link);
+    expect(mockFetch.calls[0].init?.method).toBe("POST");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      followsDefaultVersion: true,
+      allowDownload: false,
+      showAllVersions: true,
+    });
+  });
+
+  test("createShareLink creates a version-pinned share link", async () => {
+    const link = makePinnedShareLink({ versionId: "version-1", showAllVersions: false });
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.createShareLink("asset-1", {
+      versionId: "version-1",
+      active: true,
+    });
+
+    expect(result).toEqual(link);
+    expect(mockFetch.calls[0].init?.method).toBe("POST");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      versionId: "version-1",
+      active: true,
+    });
+  });
+
+  test("updateShareLink sends PATCH and returns void", async () => {
+    const mockFetch = createMockFetch({ status: 204 });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.updateShareLink("asset-1", "a1b2c3d4e", {
+      active: false,
+      showAllVersions: true,
+    });
+
+    expect(result).toBeUndefined();
+    expect(mockFetch.calls[0].init?.method).toBe("PATCH");
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets/asset-1/share-links/a1b2c3d4e");
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      active: false,
+      showAllVersions: true,
+    });
+  });
+
   test("listShareLinks returns paginated asset share links", async () => {
     const current = makeCurrentVersionShareLink();
     const pinned = makePinnedShareLink({ versionId: "version-2", showAllVersions: true });

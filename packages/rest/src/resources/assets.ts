@@ -15,7 +15,12 @@ import type {
   CdnLink,
   SetCustomFieldParams,
 } from "../types/assets";
-import type { AssetShareLink, AssetShareLinkListParams } from "../types/share-links";
+import type {
+  AssetShareLink,
+  AssetShareLinkCreateParams,
+  AssetShareLinkListParams,
+  AssetShareLinkUpdateParams,
+} from "../types/share-links";
 
 export class Assets {
   constructor(private client: AirBase) {}
@@ -176,6 +181,29 @@ export class Assets {
       { method: "GET", path: `/assets/${assetId}/share-links`, query },
       query,
     );
+  }
+
+  async createShareLink(
+    assetId: string,
+    params: AssetShareLinkCreateParams,
+  ): Promise<AssetShareLink> {
+    return this.client.request<AssetShareLink>({
+      method: "POST",
+      path: `/assets/${assetId}/share-links`,
+      body: params,
+    });
+  }
+
+  async updateShareLink(
+    assetId: string,
+    shareLinkId: string,
+    params: AssetShareLinkUpdateParams,
+  ): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: `/assets/${assetId}/share-links/${shareLinkId}`,
+      body: params,
+    });
   }
 
   listBoards(assetId: string, params: AssetBoardListParams = {}): PagePromise<Board> {

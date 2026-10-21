@@ -138,7 +138,14 @@ await air.boards.setCustomField(board.id, "custom-field-id", { value: null }); /
 
 // Share links. A board has zero or one. `url` is the public share link.
 // Disabled links are included (`active: false`). The password is never returned.
+// A 409 Conflict means a link already exists, including a disabled one.
 const { data: boardShareLinks } = await air.boards.listShareLinks(board.id);
+
+// Omitted settings follow the workspace Share Link Defaults. A parent board
+// can pass a password down, so `hasPassword` can be true without sending one.
+const boardShareLink = await air.boards.createShareLink(board.id, { allowDownload: false });
+await air.boards.updateShareLink(board.id, boardShareLink.id, { active: false });
+await air.boards.updateShareLink(board.id, boardShareLink.id, { active: true });
 
 // Guest management
 const guest = await air.boards.addGuest(board.id, {
@@ -191,7 +198,25 @@ const existingLink = cdnLinks.find((link) => link.followsDefaultVersion);
 // An asset can have one link that follows the current version and one per pinned version.
 // Disabled links are included (`active: false`). The password is never returned.
 const shareLinks = await air.assets.listShareLinks("asset-id", { limit: 12 });
+// If create returns a 409 Conflict, that link already exists (including a
+// disabled one). Use the listed link, then update it.
 const current = shareLinks.data.find((link) => link.followsDefaultVersion);
+
+// Exactly one of `followsDefaultVersion: true` or `versionId`. A pinned link
+// follows the file, not the version number. `allowDownload` is single-file
+// download only. Omitted settings follow the workspace Share Link Defaults.
+const currentShareLink = await air.assets.createShareLink("asset-id", {
+  followsDefaultVersion: true,
+  showAllVersions: true,
+});
+
+const pinnedShareLink = await air.assets.createShareLink("asset-id", {
+  versionId: "version-id",
+  allowDownload: false,
+});
+
+await air.assets.updateShareLink("asset-id", pinnedShareLink.id, { showAllVersions: true });
+await air.assets.updateShareLink("asset-id", currentShareLink.id, { active: false });
 ```
 
 ### Asset versions
