@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.7.0
+
+### Minor Changes
+
+- 4e10b7c: Add `createShareLink` and `updateShareLink` on assets and boards for public share links (`POST /assets/{assetId}/share-links`, `PATCH /assets/{assetId}/share-links/{shareLinkId}`, and the same pair on `/boards/{boardId}/share-links`).
+
+### Patch Changes
+
+- @air/api-core@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
