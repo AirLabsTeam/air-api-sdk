@@ -4,6 +4,7 @@ import { Boards } from "./resources/boards";
 import { CustomFields } from "./resources/custom-fields";
 import { Imports } from "./resources/imports";
 import { Libraries } from "./resources/libraries";
+import { Members } from "./resources/members";
 import { Roles } from "./resources/roles";
 import { Tags } from "./resources/tags";
 import { Uploads } from "./resources/uploads";
@@ -15,6 +16,7 @@ export class AirApi extends AirBase {
   readonly assets: Assets;
   readonly boards: Boards;
   readonly libraries: Libraries;
+  readonly members: Members;
   readonly tags: Tags;
   readonly customFields: CustomFields;
   readonly roles: Roles;
@@ -28,6 +30,7 @@ export class AirApi extends AirBase {
     this.assets = new Assets(this);
     this.boards = new Boards(this);
     this.libraries = new Libraries(this);
+    this.members = new Members(this);
     this.tags = new Tags(this);
     this.customFields = new CustomFields(this);
     this.roles = new Roles(this);

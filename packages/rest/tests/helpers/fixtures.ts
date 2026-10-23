@@ -2,6 +2,7 @@ import type { Asset, AssetVersion, CdnLink } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
 import type { AssetShareLink, ShareLink } from "../../src/types/share-links";
 import type { Library } from "../../src/types/libraries";
+import type { Member } from "../../src/types/members";
 import type { Tag } from "../../src/types/tags";
 import type { CustomField } from "../../src/types/custom-fields";
 import type { Workspace } from "../../src/types/workspaces";
@@ -35,6 +36,19 @@ export function makeLibrary(overrides: Partial<Library> = {}): Library {
     visibility: "workspaceMembers",
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+export function makeMember(overrides: Partial<Member> = {}): Member {
+  return {
+    id: "account-1",
+    type: "member",
+    displayName: "Ada Lovelace",
+    firstName: "Ada",
+    lastName: "Lovelace",
+    email: "ada@example.com",
+    firstJoinedAt: "2024-01-01 00:00:00.000000+00",
     ...overrides,
   };
 }

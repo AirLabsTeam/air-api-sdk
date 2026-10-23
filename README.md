@@ -263,6 +263,31 @@ await air.customFields.updateValue(cf.id, value.id, { name: "Under Review" });
 await air.customFields.deleteValue(cf.id, value.id);
 ```
 
+### Members
+
+The workspace directory. `id` is the account id used for comment authors and mentions.
+
+```ts
+// Defaults to `type: "member"`. Pass "guest" or "libraryMember" for the others.
+const members = await air.members.list({ limit: 50 });
+// [{ id, type, displayName, firstName, lastName, email, firstJoinedAt, avatar? }]
+
+// Case-insensitive substring on first name, last name, full name, or email.
+const matches = await air.members.list({ search: "ada" });
+
+// Exact, case-insensitive. With no `type`, every type is searched.
+// An unknown email returns an empty page.
+const byEmail = await air.members.list({ email: "ada@example.com" });
+const member = byEmail.data[0];
+
+// Auto-paginate. Sorted by `firstJoinedAt`, then `id`.
+for await (const guest of air.members.list({ type: "guest" })) {
+  console.log(guest.email);
+}
+```
+
+`search` and `email` cannot be combined. Requires the `members.read` OAuth scope. Board guests and library-only members get a 403.
+
 ### Roles
 
 ```ts
