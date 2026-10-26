@@ -167,8 +167,9 @@ const searched = await air.assets.list({ search: "logo" });
 const semantic = await air.assets.list({ search: "sunset over water", semantic: true });
 
 // Custom field filters. Repeats of one field are OR for select and `text`.
-// Different fields are AND. One field takes one operator: `text`, `textPrefix`,
-// or `textNot`. `semantic: true` rejects `customField`. `boards.list` still
+// Different fields are AND. A plain-text field takes one of `text`,
+// `textPrefix`, or `textNot`. A date field takes one `dateGte` and one
+// `dateLte`. `semantic: true` rejects `customField`. `boards.list` still
 // accepts only `fieldId:valueId` strings.
 const selected = await air.assets.list({
   customField: { id: "field-id", valueId: "value-id" },
