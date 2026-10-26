@@ -21,6 +21,7 @@ import type {
   AssetShareLinkListParams,
   AssetShareLinkUpdateParams,
 } from "../types/share-links";
+import { serializeAssetCustomFieldFilter } from "./serialize-asset-custom-field-filter";
 
 export class Assets {
   constructor(private client: AirBase) {}
@@ -46,7 +47,9 @@ export class Assets {
     }
 
     if (params.customField) {
-      query.customField = params.customField;
+      query.customField = Array.isArray(params.customField)
+        ? params.customField.map(serializeAssetCustomFieldFilter)
+        : serializeAssetCustomFieldFilter(params.customField);
     }
 
     if (params["createdAt[gte]"]) {

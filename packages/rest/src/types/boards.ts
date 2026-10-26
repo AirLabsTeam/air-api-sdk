@@ -14,6 +14,11 @@ export interface Board {
 export interface BoardListParams extends CursorPageParams {
   name?: string;
   parentBoardId?: string;
+  /**
+   * Select filters only, as `fieldId:valueId`. Repeats of one field are OR, and
+   * different fields are AND. Plain-text and date operators are rejected with
+   * 400; use `assets.list` for those.
+   */
   customField?: string | string[];
   /**
    * Only return boards in this library. Mutually exclusive with

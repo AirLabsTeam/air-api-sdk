@@ -166,6 +166,33 @@ const page = await air.assets.list({ parentBoardId: "board-id", limit: 20 });
 const searched = await air.assets.list({ search: "logo" });
 const semantic = await air.assets.list({ search: "sunset over water", semantic: true });
 
+// Custom field filters. Repeats of one field are OR for select and `text`.
+// Different fields are AND. One field takes one operator: `text`, `textPrefix`,
+// or `textNot`. `semantic: true` rejects `customField`. `boards.list` still
+// accepts only `fieldId:valueId` strings.
+const selected = await air.assets.list({
+  customField: { id: "field-id", valueId: "value-id" },
+});
+const titled = await air.assets.list({
+  customField: [
+    { id: "title-field-id", operator: "text", value: "Launch film" },
+    { id: "title-field-id", operator: "text", value: "Teaser" },
+    { id: "notes-field-id", operator: "textNot", value: "archive" },
+  ],
+});
+const prefixed = await air.assets.list({
+  customField: { id: "title-field-id", operator: "textPrefix", value: "Launch" },
+});
+// A calendar date is that UTC day. A date picked in the app is stored as the
+// viewer's local midnight converted to UTC, so pass an ISO-8601 instant to
+// match the day shown in the app. `+` in an offset is encoded for you.
+const due = await air.assets.list({
+  customField: [
+    { id: "due-field-id", operator: "dateGte", value: "2026-06-01" },
+    { id: "due-field-id", operator: "dateLte", value: "2026-06-30T16:00:00.000Z" },
+  ],
+});
+
 // Get and delete
 const asset = await air.assets.get("asset-id");
 await air.assets.delete("asset-id");
