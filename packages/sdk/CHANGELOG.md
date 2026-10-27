@@ -1,5 +1,17 @@
 # @air/api-sdk
 
+## 0.9.0
+
+### Minor Changes
+
+- 066afd9: Share link create and update accept `password`, `expiresAt`, `requireAccount`, `comments`, and `customFields`. `null` clears `password` and `expiresAt`. The password is write only.
+
+### Patch Changes
+
+- Updated dependencies [066afd9]
+  - @air/api-rest@0.9.0
+  - @air/api-core@0.9.0
+
 ## 0.8.0
 
 ### Minor Changes
