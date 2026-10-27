@@ -133,6 +133,56 @@ describe("Boards", () => {
     expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({});
   });
 
+  test("createShareLink sends paid settings", async () => {
+    const link = makeShareLink({
+      hasPassword: true,
+      expiresAt: "2027-01-01T00:00:00.000Z",
+      requireAccount: true,
+      comments: "read_only",
+      customFields: "hidden",
+    });
+    const mockFetch = createMockFetch({ status: 201, body: link });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.createShareLink("board-1", {
+      password: "a-secret",
+      expiresAt: "2027-01-01T00:00:00.000Z",
+      requireAccount: true,
+      comments: "read_only",
+      customFields: "hidden",
+    });
+
+    expect(result).toEqual(link);
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      password: "a-secret",
+      expiresAt: "2027-01-01T00:00:00.000Z",
+      requireAccount: true,
+      comments: "read_only",
+      customFields: "hidden",
+    });
+    expect(JSON.stringify(result)).not.toContain("a-secret");
+  });
+
+  test("updateShareLink sends null to clear password and expiration", async () => {
+    const mockFetch = createMockFetch({ status: 204 });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.boards.updateShareLink("board-1", "a1b2c3d4e", {
+      password: null,
+      expiresAt: null,
+      comments: "hidden",
+      customFields: "editable",
+    });
+
+    expect(result).toBeUndefined();
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      password: null,
+      expiresAt: null,
+      comments: "hidden",
+      customFields: "editable",
+    });
+  });
+
   test("updateShareLink sends PATCH and returns void", async () => {
     const mockFetch = createMockFetch({ status: 204 });
     const client = new AirApi(createClientOptions(mockFetch));

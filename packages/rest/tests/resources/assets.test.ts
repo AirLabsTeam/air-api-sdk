@@ -254,6 +254,30 @@ describe("Assets", () => {
     });
   });
 
+  test("updateShareLink sends paid settings", async () => {
+    const mockFetch = createMockFetch({ status: 204 });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    const result = await client.assets.updateShareLink("asset-1", "a1b2c3d4e", {
+      password: "a-secret",
+      expiresAt: "2027-01-01T00:00:00.000Z",
+      requireAccount: true,
+      comments: "allowed",
+      customFields: "editable",
+      showAllVersions: false,
+    });
+
+    expect(result).toBeUndefined();
+    expect(JSON.parse(mockFetch.calls[0].init?.body as string)).toEqual({
+      password: "a-secret",
+      expiresAt: "2027-01-01T00:00:00.000Z",
+      requireAccount: true,
+      comments: "allowed",
+      customFields: "editable",
+      showAllVersions: false,
+    });
+  });
+
   test("updateShareLink sends PATCH and returns void", async () => {
     const mockFetch = createMockFetch({ status: 204 });
     const client = new AirApi(createClientOptions(mockFetch));

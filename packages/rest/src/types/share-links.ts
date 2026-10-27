@@ -1,9 +1,15 @@
 import type { CursorPageParams, CursorPageResponse } from "@air/api-core";
 
-/** Visitor comment access on a share link. */
+/**
+ * Visitor comment access on a share link.
+ * `allowed` lets anyone with the link post comments.
+ */
 export type ShareLinkCommentsAccess = "hidden" | "read_only" | "allowed";
 
-/** Visitor custom field access on a share link. */
+/**
+ * Visitor custom field access on a share link.
+ * `editable` lets anyone with the link change custom field values.
+ */
 export type ShareLinkCustomFieldsAccess = "hidden" | "read_only" | "editable";
 
 /**
@@ -63,10 +69,28 @@ export interface BoardShareLinkListResponse extends CursorPageResponse<BoardShar
  * Settings accepted on share-link create and update.
  * Omitted fields follow the workspace Share Link Defaults on create,
  * and stay unchanged on update.
+ *
+ * `password` is write only; reads return `hasPassword`. `null` clears
+ * `password` and `expiresAt`. An empty password is rejected. `expiresAt`
+ * must be an ISO 8601 date-time in the future.
+ *
+ * Turning `password`, `expiresAt`, `requireAccount`, `comments`, or
+ * `customFields` on needs the workspace `shareLinks` add-on. Otherwise the
+ * API returns 422 `ADDON_DISABLED` and applies nothing in the request.
+ * `extra.settings` names the rejected settings, and uses `expiration` for
+ * `expiresAt`. Re-sending a value the link already has, changing an existing
+ * password or expiration, and turning a setting off are accepted.
  */
 export interface ShareLinkWriteSettings {
   active?: boolean;
   allowDownload?: boolean;
+  /** Write only. `null` removes the password. */
+  password?: string | null;
+  /** ISO 8601 date-time in the future. `null` removes the expiration. */
+  expiresAt?: string | null;
+  requireAccount?: boolean;
+  comments?: ShareLinkCommentsAccess;
+  customFields?: ShareLinkCustomFieldsAccess;
 }
 
 /** Asset links also accept `showAllVersions`. */
