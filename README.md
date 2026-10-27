@@ -148,12 +148,12 @@ const { data: boardShareLinks } = await air.boards.listShareLinks(board.id);
 // `comments: "allowed"` lets anyone with the link post comments.
 // `customFields: "editable"` lets them change custom field values.
 // Turning password, expiration, require-account, comments, or custom fields
-// on needs the workspace shareLinks add-on. Raising comments from
-// `read_only` to `allowed`, or custom fields from `read_only` to
-// `editable`, also counts as turning it on. A link that already shows
-// comments can still get 422 ADDON_DISABLED, and nothing is applied.
-// `extra.settings` uses `expiration` for `expiresAt`. Re-sending a value
-// the link already has, or turning one off, is accepted.
+// on needs the workspace shareLinks add-on. Otherwise the API returns 422
+// ADDON_DISABLED and applies nothing. Raising comments from `read_only` to
+// `allowed`, or custom fields from `read_only` to `editable`, also counts
+// as turning it on, so a link that already shows them can still get that
+// 422. `extra.settings` uses `expiration` for `expiresAt`. Re-sending a
+// value the link already has, or turning one off, is accepted.
 const boardShareLink = await air.boards.createShareLink(board.id, {
   allowDownload: false,
   password: "a-secret",
