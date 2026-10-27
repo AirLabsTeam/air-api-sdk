@@ -1,5 +1,17 @@
 # @air/api-sdk
 
+## 0.8.0
+
+### Minor Changes
+
+- 3caed68: `assets.list` accepts plain-text (`text`, `textPrefix`, `textNot`) and date (`dateGte`, `dateLte`) custom field filters, plus structured select filters. Strings such as `fieldId:valueId` still pass through. `boards.list` stays select-only.
+
+### Patch Changes
+
+- Updated dependencies [3caed68]
+  - @air/api-rest@0.8.0
+  - @air/api-core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes
