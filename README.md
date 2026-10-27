@@ -143,9 +143,30 @@ const { data: boardShareLinks } = await air.boards.listShareLinks(board.id);
 
 // Omitted settings follow the workspace Share Link Defaults. A parent board
 // can pass a password down, so `hasPassword` can be true without sending one.
-const boardShareLink = await air.boards.createShareLink(board.id, { allowDownload: false });
+// `password` is write only. `null` clears `password` and `expiresAt`.
+// `expiresAt` must be an ISO 8601 date-time in the future.
+// `comments: "allowed"` lets anyone with the link post comments.
+// `customFields: "editable"` lets them change custom field values.
+// Turning password, expiration, require-account, comments, or custom fields
+// on needs the workspace shareLinks add-on. Otherwise the API returns 422
+// ADDON_DISABLED and applies nothing. Raising comments from `read_only` to
+// `allowed`, or custom fields from `read_only` to `editable`, also counts
+// as turning it on, so a link that already shows them can still get that
+// 422. `extra.settings` uses `expiration` for `expiresAt`. Re-sending a
+// value the link already has, or turning one off, is accepted.
+const boardShareLink = await air.boards.createShareLink(board.id, {
+  allowDownload: false,
+  password: "a-secret",
+  expiresAt: "2027-01-01T00:00:00.000Z",
+  requireAccount: true,
+  comments: "read_only",
+  customFields: "hidden",
+});
 await air.boards.updateShareLink(board.id, boardShareLink.id, { active: false });
-await air.boards.updateShareLink(board.id, boardShareLink.id, { active: true });
+await air.boards.updateShareLink(board.id, boardShareLink.id, {
+  password: null,
+  expiresAt: null,
+});
 
 // Guest management
 const guest = await air.boards.addGuest(board.id, {
@@ -233,9 +254,12 @@ const current = shareLinks.data.find((link) => link.followsDefaultVersion);
 // Exactly one of `followsDefaultVersion: true` or `versionId`. A pinned link
 // follows the file, not the version number. `allowDownload` is single-file
 // download only. Omitted settings follow the workspace Share Link Defaults.
+// Create and update accept the same paid settings as board share links.
 const currentShareLink = await air.assets.createShareLink("asset-id", {
   followsDefaultVersion: true,
   showAllVersions: true,
+  password: "a-secret",
+  comments: "read_only",
 });
 
 const pinnedShareLink = await air.assets.createShareLink("asset-id", {
