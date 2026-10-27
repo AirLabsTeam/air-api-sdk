@@ -75,11 +75,14 @@ export interface BoardShareLinkListResponse extends CursorPageResponse<BoardShar
  * must be an ISO 8601 date-time in the future.
  *
  * Turning `password`, `expiresAt`, `requireAccount`, `comments`, or
- * `customFields` on needs the workspace `shareLinks` add-on. Otherwise the
- * API returns 422 `ADDON_DISABLED` and applies nothing in the request.
- * `extra.settings` names the rejected settings, and uses `expiration` for
- * `expiresAt`. Re-sending a value the link already has, changing an existing
- * password or expiration, and turning a setting off are accepted.
+ * `customFields` on needs the workspace `shareLinks` add-on. Raising
+ * `comments` from `read_only` to `allowed`, or `customFields` from
+ * `read_only` to `editable`, counts as turning it on. A link that already
+ * shows comments can still get 422 `ADDON_DISABLED`, and nothing in the
+ * request is applied. `extra.settings` names the rejected settings, and
+ * uses `expiration` for `expiresAt`. Re-sending a value the link already
+ * has, changing an existing password or expiration, and turning a setting
+ * off are accepted.
  */
 export interface ShareLinkWriteSettings {
   active?: boolean;
