@@ -44,11 +44,66 @@ export interface Asset {
   coverVersion: AssetVersion;
 }
 
+export type AssetCustomFieldTextOperator = "text" | "textPrefix" | "textNot";
+
+export type AssetCustomFieldDateOperator = "dateGte" | "dateLte";
+
+export interface AssetCustomFieldSelectFilter {
+  id: string;
+  valueId: string;
+}
+
+export interface AssetCustomFieldTextFilter {
+  id: string;
+  operator: AssetCustomFieldTextOperator;
+  value: string;
+}
+
+export interface AssetCustomFieldDateFilter {
+  id: string;
+  operator: AssetCustomFieldDateOperator;
+  value: string;
+}
+
+/**
+ * One `customField` query value for `assets.list`.
+ *
+ * A string is sent unchanged (`fieldId:valueId`, or an operator string the
+ * caller already formatted). A structured filter is serialized to that same
+ * query value. Repeats become repeated query params.
+ */
+export type AssetCustomFieldFilter =
+  | string
+  | AssetCustomFieldSelectFilter
+  | AssetCustomFieldTextFilter
+  | AssetCustomFieldDateFilter;
+
 export interface AssetListParams extends CursorPageParams {
   parentBoardId?: string;
   includeNestedAssets?: boolean;
   tag?: string | string[];
-  customField?: string | string[];
+  /**
+   * Filter by custom field. Select filters are `{ id, valueId }` (or the
+   * `fieldId:valueId` string). Repeats of one field are OR, and different
+   * fields are AND.
+   *
+   * Plain text is `{ id, operator: "text" | "textPrefix" | "textNot", value }`.
+   * `text` repeats are OR, `textPrefix` is one prefix, and `textNot` excludes.
+   * The value keeps colons and surrounding spaces. Empty text, more than 256
+   * characters, and more than 20 values are rejected with 400.
+   *
+   * Dates are `{ id, operator: "dateGte" | "dateLte", value }`. `dateGte` is an
+   * inclusive start and `dateLte` is an inclusive end, one of each per field.
+   * A `YYYY-MM-DD` value is that UTC day (`dateGte` at `T00:00:00.000Z`,
+   * `dateLte` at `T23:59:59.999Z`). The app stores a picked date as the
+   * viewer's local midnight converted to UTC, so match that shown day with an
+   * ISO-8601 instant (`T` and `Z` or `±HH:MM`). A start after the end is 400.
+   *
+   * One field accepts one operator kind. A mix of select, `text`, `textPrefix`,
+   * `textNot`, and date bounds on that field is 400. `boards.list` accepts
+   * select strings only. `semantic: true` rejects `customField`.
+   */
+  customField?: AssetCustomFieldFilter | AssetCustomFieldFilter[];
   search?: string;
   /**
    * When true, `search` is used for semantic search via AI embeddings.

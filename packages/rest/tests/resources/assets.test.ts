@@ -36,6 +36,62 @@ describe("Assets", () => {
     expect(url).not.toContain("semantic=");
   });
 
+  test("list serializes plain-text and date custom field filters", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.list({
+      customField: [
+        { id: "field-1", valueId: "option-1" },
+        "field-2:option-2",
+        { id: "field-3", operator: "text", value: "Launch: film" },
+        { id: "field-5", operator: "textPrefix", value: "Launch" },
+        { id: "field-6", operator: "textNot", value: " archive " },
+        { id: "field-4", operator: "dateGte", value: "2026-06-10" },
+        { id: "field-4", operator: "dateLte", value: "2026-06-10T00:00:00+02:00" },
+      ],
+    });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.searchParams.getAll("customField")).toEqual([
+      "field-1:option-1",
+      "field-2:option-2",
+      "field-3:text:Launch: film",
+      "field-5:textPrefix:Launch",
+      "field-6:textNot: archive ",
+      "field-4:dateGte:2026-06-10",
+      "field-4:dateLte:2026-06-10T00:00:00+02:00",
+    ]);
+    expect(url.toString()).toContain("%2B02%3A00");
+  });
+
+  test("list serializes one select custom field filter", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.list({ customField: { id: "field-1", valueId: "option-1" } });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.searchParams.get("customField")).toBe("field-1:option-1");
+  });
+
+  test("list rejects a custom field filter that sets both valueId and operator", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    expect(() =>
+      client.assets.list({
+        customField: {
+          id: "field-1",
+          valueId: "option-1",
+          operator: "text",
+          value: "Launch",
+        } as never,
+      }),
+    ).toThrow(/must be a select \{ id, valueId \} or an operator/);
+    expect(mockFetch.calls).toHaveLength(0);
+  });
+
   test("list passes semantic search flag", async () => {
     const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
     const client = new AirApi(createClientOptions(mockFetch));
