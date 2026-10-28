@@ -80,6 +80,19 @@ export type AssetCustomFieldFilter =
 
 export interface AssetListParams extends CursorPageParams {
   parentBoardId?: string;
+  /**
+   * Only return assets added to this showcase. With `includeNestedAssets`,
+   * also returns the assets inside the boards added to it. Items on the
+   * showcase's sub-pages are not returned. Combining with `parentBoardId`
+   * or `semantic: true` is rejected with 400. An unknown showcase is 404;
+   * one the caller cannot view is 403.
+   */
+  showcaseId?: string;
+  /**
+   * With `parentBoardId`, return assets from nested sub-boards. With
+   * `showcaseId`, also return assets inside the boards added to the
+   * showcase. Requires one of those filters.
+   */
   includeNestedAssets?: boolean;
   tag?: string | string[];
   /**
@@ -109,7 +122,7 @@ export interface AssetListParams extends CursorPageParams {
    * When true, `search` is used for semantic search via AI embeddings.
    * Requires a non-blank `search` value and Semantic Search enabled on the workspace.
    * Returns a single page of results ordered by relevance. Combining with `tag`,
-   * `customField`, `createdAt`, or `cursor` is rejected by the API with 400.
+   * `customField`, `createdAt`, `cursor`, or `showcaseId` is rejected by the API with 400.
    */
   semantic?: boolean;
   "createdAt[gte]"?: string;

@@ -119,6 +119,11 @@ const page = await air.boards.list({ limit: 10 });
 // Filter by name or parent
 const filtered = await air.boards.list({ name: "My Board", parentBoardId: "board-id" });
 
+// Boards added to a showcase. Cannot be combined with parentBoardId,
+// libraryId, or inGeneralLibrary. Boards on the showcase's sub-pages
+// are not returned.
+const showcaseBoards = await air.boards.list({ showcaseId: "showcase-id" });
+
 // CRUD
 const board = await air.boards.create({ title: "New Board", description: "Optional" });
 const fetched = await air.boards.get(board.id);
@@ -179,11 +184,77 @@ await air.boards.updateGuest(board.id, guest.id, { roleId: "new-role-id" });
 await air.boards.removeGuest(board.id, guest.id);
 ```
 
+### Showcases
+
+```ts
+// A showcase is a collection with one share link. Create makes both, and
+// the result includes the link. It does not take items; add them after.
+// List returns the showcases you can see: every showcase when your role
+// can view them all, otherwise only the ones you own. Showcases without a
+// share link are left out; read one by id and `shareLink` is null.
+// Sub-pages are not listed, and a sub-page id is not found. A showcase
+// that has sub-pages comes back with only its top-level items.
+// `limit` defaults to 12 and values above 200 are treated as 200.
+const page = await air.showcases.list({
+  search: "campaign",
+  status: "active", // "active" | "inactive" | "expired"
+  limit: 12,
+});
+
+const showcase = await air.showcases.create({
+  name: "Fall campaign",
+  description: "Selects for the retail team",
+  // Omitted share link settings follow the workspace Share Link Defaults.
+  // The same paid settings as a board link apply, including the 422 when
+  // the plan does not include a setting the request turns on.
+  shareLink: { allowDownload: false, comments: "read_only" },
+});
+
+// Adding an item that is already in the showcase succeeds. An unknown,
+// trashed, or other-workspace id is not found. An item you cannot view is
+// forbidden. The showcase itself follows the same rule.
+await air.showcases.addAssets(showcase.id, { assetIds: ["asset-id-1", "asset-id-2"] });
+await air.showcases.addBoards(showcase.id, { boardIds: ["board-id-1"] });
+
+// Removing an item that is not in the showcase succeeds. The item is not deleted.
+await air.showcases.removeAsset(showcase.id, "asset-id-1");
+await air.showcases.removeBoard(showcase.id, "board-id-1");
+
+// List the items. On assets, includeNestedAssets also returns assets inside
+// the boards on the showcase. showcaseId cannot be combined with
+// parentBoardId or semantic search. On boards it cannot be combined with
+// parentBoardId, libraryId, or inGeneralLibrary.
+const assets = await air.assets.list({
+  showcaseId: showcase.id,
+  includeNestedAssets: true,
+});
+const boards = await air.boards.list({ showcaseId: showcase.id });
+
+const fetched = await air.showcases.get(showcase.id);
+await air.showcases.update(showcase.id, {
+  name: "Fall campaign, final selects",
+  description: null, // clear
+});
+
+// `password` is write only. `null` clears `password` and `expiresAt`.
+if (showcase.shareLink) {
+  await air.showcases.updateShareLink(showcase.id, showcase.shareLink.id, { active: false });
+  await air.showcases.updateShareLink(showcase.id, showcase.shareLink.id, {
+    password: null,
+    expiresAt: null,
+  });
+}
+```
+
 ### Assets
 
 ```ts
-// List assets (supports filtering by board, tags, custom fields, search, date range)
+// List assets (supports filtering by board, showcase, tags, custom fields, search, date range)
 const page = await air.assets.list({ parentBoardId: "board-id", limit: 20 });
+// Assets added to a showcase. With includeNestedAssets, also returns assets
+// inside the boards on the showcase. Cannot be combined with parentBoardId
+// or semantic search. Items on the showcase's sub-pages are not returned.
+const showcaseAssets = await air.assets.list({ showcaseId: "showcase-id" });
 const searched = await air.assets.list({ search: "logo" });
 const semantic = await air.assets.list({ search: "sunset over water", semantic: true });
 

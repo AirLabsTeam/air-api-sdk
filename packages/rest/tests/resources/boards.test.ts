@@ -13,6 +13,17 @@ describe("Boards", () => {
     expect(page.data).toEqual([board]);
   });
 
+  test("list forwards the showcaseId filter", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.boards.list({ showcaseId: "showcase-1" });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/boards");
+    expect(url.searchParams.get("showcaseId")).toBe("showcase-1");
+  });
+
   test("list forwards the libraryId filter", async () => {
     const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
     const client = new AirApi(createClientOptions(mockFetch));

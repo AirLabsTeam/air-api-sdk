@@ -92,6 +92,18 @@ describe("Assets", () => {
     expect(mockFetch.calls).toHaveLength(0);
   });
 
+  test("list forwards the showcaseId filter with nested assets", async () => {
+    const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
+    const client = new AirApi(createClientOptions(mockFetch));
+
+    await client.assets.list({ showcaseId: "showcase-1", includeNestedAssets: true });
+
+    const url = new URL(mockFetch.calls[0].url);
+    expect(url.pathname).toBe("/v1/assets");
+    expect(url.searchParams.get("showcaseId")).toBe("showcase-1");
+    expect(url.searchParams.get("includeNestedAssets")).toBe("true");
+  });
+
   test("list passes semantic search flag", async () => {
     const mockFetch = createMockFetch({ body: makePaginatedResponse([]) });
     const client = new AirApi(createClientOptions(mockFetch));

@@ -1,5 +1,6 @@
 import type { Asset, AssetVersion, CdnLink } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
+import type { Showcase } from "../../src/types/showcases";
 import type { AssetShareLink, ShareLink } from "../../src/types/share-links";
 import type { Library } from "../../src/types/libraries";
 import type { Tag } from "../../src/types/tags";
@@ -67,6 +68,19 @@ export function makeAsset(overrides: Partial<Asset> = {}): Asset {
     id: "asset-1",
     customFields: undefined,
     coverVersion: makeAssetVersion(),
+    ...overrides,
+  };
+}
+
+export function makeShowcase(overrides: Partial<Showcase> = {}): Showcase {
+  return {
+    id: "showcase-1",
+    name: "Fall campaign",
+    description: "Selects for the retail team",
+    createdAt: "2026-10-27T15:00:00.000Z",
+    updatedAt: "2026-10-27T15:00:00.000Z",
+    stats: { assetCount: 0, fileCount: 0, boardCount: 0 },
+    shareLink: makeShareLink({ id: "c4d5e6f7a", url: "https://app.air.inc/a/c4d5e6f7a" }),
     ...overrides,
   };
 }
