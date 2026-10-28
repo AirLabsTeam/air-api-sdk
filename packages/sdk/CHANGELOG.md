@@ -1,5 +1,17 @@
 # @air/api-sdk
 
+## 0.10.0
+
+### Minor Changes
+
+- 5025d0c: Add a `showcases` resource (`list`, `get`, `create`, `update`, `updateShareLink`, `addAssets`, `removeAsset`, `addBoards`, `removeBoard`) and a `showcaseId` filter on `assets.list` and `boards.list`.
+
+### Patch Changes
+
+- Updated dependencies [5025d0c]
+  - @air/api-rest@0.10.0
+  - @air/api-core@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes
