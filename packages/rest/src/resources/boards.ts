@@ -28,6 +28,7 @@ export class Boards {
       cursor: params.cursor,
       name: params.name,
       parentBoardId: params.parentBoardId,
+      showcaseId: params.showcaseId,
       libraryId: params.libraryId,
       inGeneralLibrary: params.inGeneralLibrary,
     };

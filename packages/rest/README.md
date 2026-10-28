@@ -2,7 +2,7 @@
 
 Typed REST client for the [Air API SDK](https://github.com/AirLabsTeam/air-api-sdk).
 
-This package provides the resource classes (boards, assets, tags, custom fields, uploads, imports, roles) and their TypeScript types. It builds on `@air/api-core` for HTTP transport.
+This package provides the resource classes (boards, showcases, assets, tags, custom fields, uploads, imports, roles) and their TypeScript types. It builds on `@air/api-core` for HTTP transport.
 
 ## Installation
 
@@ -20,7 +20,8 @@ npm install @air/api-rest
 
 ## What's included
 
-- Resource classes: `BoardsResource`, `AssetsResource`, `TagsResource`, `CustomFieldsResource`, `UploadsResource`, `ImportsResource`, `RolesResource`
+- Resource classes: `Boards`, `Showcases`, `Assets`, `Tags`, `CustomFields`, `Uploads`, `Imports`, `Roles`
+- Showcases: `list`, `get`, `create`, `update`, `updateShareLink`, `addAssets`, `removeAsset`, `addBoards`, `removeBoard`, plus a `showcaseId` filter on `assets.list` and `boards.list`
 - Asset CDN link helpers: `listCdnLinks`, `createCdnLink`, and `updateCdnLink`
 - Share links: `listShareLinks`, `createShareLink`, and `updateShareLink` on assets and boards
 - Full TypeScript types for all API request/response shapes

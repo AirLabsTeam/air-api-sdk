@@ -15,6 +15,13 @@ export interface BoardListParams extends CursorPageParams {
   name?: string;
   parentBoardId?: string;
   /**
+   * Only return boards added to this showcase. Boards on the showcase's
+   * sub-pages are not returned. Combining with `parentBoardId`, `libraryId`,
+   * or `inGeneralLibrary` is rejected with 400. An unknown showcase is 404;
+   * one the caller cannot view is 403.
+   */
+  showcaseId?: string;
+  /**
    * Select filters only, as `fieldId:valueId`. Repeats of one field are OR, and
    * different fields are AND. Plain-text and date operators are rejected with
    * 400; use `assets.list` for those.
@@ -22,13 +29,14 @@ export interface BoardListParams extends CursorPageParams {
   customField?: string | string[];
   /**
    * Only return boards in this library. Mutually exclusive with
-   * `inGeneralLibrary` — passing both results in a `400` (BadRequestError).
+   * `inGeneralLibrary` and with `showcaseId`. Combining either pair results
+   * in a `400` (BadRequestError).
    */
   libraryId?: string;
   /**
    * Only return boards in the General library (boards not in any real library).
-   * Mutually exclusive with `libraryId` — passing both results in a `400`
-   * (BadRequestError).
+   * Mutually exclusive with `libraryId` and with `showcaseId`. Combining
+   * either pair results in a `400` (BadRequestError).
    */
   inGeneralLibrary?: boolean;
 }

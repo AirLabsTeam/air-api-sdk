@@ -1,5 +1,6 @@
 export * from "./assets";
 export * from "./boards";
+export * from "./showcases";
 export * from "./libraries";
 export * from "./tags";
 export * from "./custom-fields";

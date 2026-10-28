@@ -31,6 +31,7 @@ export class Assets {
       limit: params.limit,
       cursor: params.cursor,
       parentBoardId: params.parentBoardId,
+      showcaseId: params.showcaseId,
       search: params.search,
     };
 
