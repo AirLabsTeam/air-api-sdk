@@ -3,6 +3,8 @@ import type { Board } from "../../src/types/boards";
 import type { Showcase } from "../../src/types/showcases";
 import type { AssetShareLink, ShareLink } from "../../src/types/share-links";
 import type { Library } from "../../src/types/libraries";
+import type { Discussion, DiscussionComment } from "../../src/types/discussions";
+import type { Member } from "../../src/types/members";
 import type { Tag } from "../../src/types/tags";
 import type { CustomField } from "../../src/types/custom-fields";
 import type { Workspace } from "../../src/types/workspaces";
@@ -159,6 +161,57 @@ export function makeWorkspace(overrides: Partial<Workspace> = {}): Workspace {
   return {
     id: "workspace-1",
     name: "Test Workspace",
+    ...overrides,
+  };
+}
+
+export function makeDiscussionComment(
+  overrides: Partial<DiscussionComment> = {},
+): DiscussionComment {
+  return {
+    id: "comment-1",
+    discussionId: "discussion-1",
+    body: "Please review",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+    author: {
+      type: "workspace_account",
+      id: "account-1",
+      displayName: "Ada Lovelace",
+    },
+    mentions: [],
+    ...overrides,
+  };
+}
+
+export function makeDiscussion(overrides: Partial<Discussion> = {}): Discussion {
+  const comment = makeDiscussionComment();
+  return {
+    id: "discussion-1",
+    resolved: false,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    lastCommentedAt: "2024-01-01T00:00:00.000Z",
+    asset: { id: "asset-1" },
+    assetVersion: { id: "version-1", version: 2 },
+    annotations: [],
+    comments: {
+      data: [comment],
+      pagination: { hasMore: false, cursor: null },
+      total: 1,
+    },
+    ...overrides,
+  };
+}
+
+export function makeMember(overrides: Partial<Member> = {}): Member {
+  return {
+    id: "account-1",
+    type: "member",
+    displayName: "Ada Lovelace",
+    firstName: "Ada",
+    lastName: "Lovelace",
+    email: "ada@example.com",
+    firstJoinedAt: "2024-03-01T12:00:00.000Z",
     ...overrides,
   };
 }
