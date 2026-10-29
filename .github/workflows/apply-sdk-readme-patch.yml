@@ -1,0 +1,33 @@
+name: apply-sdk-readme-patch
+
+on:
+  push:
+    branches:
+      - cursor/public-api-discussion-member-sdk-2541
+    paths:
+      - .github/workflows/apply-sdk-readme-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: cursor/public-api-discussion-member-sdk-2541
+      - name: Apply README patch and remove the helper
+        run: |
+          set -euo pipefail
+          if [ ! -f sdk-readme.patch ]; then
+            echo "patch already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          patch -p1 < sdk-readme.patch
+          git add README.md
+          git rm -f sdk-readme.patch .github/workflows/apply-sdk-readme-patch.yml
+          git commit -m "docs(sdk): document discussions and members"
+          git push origin HEAD:cursor/public-api-discussion-member-sdk-2541
