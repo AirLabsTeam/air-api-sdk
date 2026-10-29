@@ -428,7 +428,8 @@ const reply = await air.discussions.createComment(created.id, { body: "Looks goo
 
 // Resolve, edit, and delete return an empty body.
 await air.discussions.update(created.id, { resolved: true });
-// Omitting mentions when the comment has them is 409. [] removes them.
+// Omitting mentions (or sending null) when the comment has them is 409.
+// [] removes them.
 await air.discussions.updateComment(created.id, reply.id, {
   body: "Updated",
   mentions: [],
@@ -450,7 +451,7 @@ const members = await air.members.list({ type: "member", search: "ada", limit: 5
 const byEmail = await air.members.list({ email: "ada@example.com" });
 ```
 
-`id` is the account id used as `mentions[].accountId` when writing a comment. `firstJoinedAt` is the first time that person joined. Sort is fixed: `firstJoinedAt` ascending, then `id`. `email` and `search` cannot be combined. The cursor must be sent with the same filters.
+`id` is the account id used as `mentions[].accountId` when writing a comment. `firstJoinedAt` is the first time that person joined. It is the stored Postgres timestamp text (`2024-03-01 12:00:00.123456+00`), not ISO 8601, with up to 6 fraction digits and a UTC offset, so don't parse a fixed width. Sort is fixed: `firstJoinedAt` ascending, then `id`. `email` and `search` cannot be combined. The cursor must be sent with the same filters.
 
 ### Uploads
 

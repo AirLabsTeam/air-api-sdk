@@ -68,8 +68,13 @@ export class Discussions {
 
   /**
    * Start a discussion on an asset version. `assetVersionId` is required.
-   * The body has no board. Mention someone with `{{mention:N}}` and a
-   * `mentions` entry at that index.
+   * Mention someone with `{{mention:N}}` and a `mentions` entry at that index.
+   * On a document or PDF, every annotation needs a `pageNumber`.
+   *
+   * The body has no board. In a workspace that scopes comments to boards, a
+   * discussion with no board needs `asset.canManageDiscussions` at the
+   * workspace level, so a board guest gets 403 even when they can comment in
+   * their board. A timeout can create a duplicate: list before retrying.
    */
   async create(params: DiscussionCreateParams): Promise<Discussion> {
     return this.client.request<Discussion>({
@@ -105,7 +110,8 @@ export class Discussions {
 
   /**
    * Replace a comment's text and mentions. Only the author can edit.
-   * The response is empty. Omitting `mentions` when the comment has them is 409.
+   * The response is empty, and the edit notifies no one. Omitting `mentions`,
+   * or sending `null`, when the comment has them is 409. `[]` removes them.
    */
   async updateComment(
     discussionId: string,

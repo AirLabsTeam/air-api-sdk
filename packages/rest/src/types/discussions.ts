@@ -98,26 +98,34 @@ export interface BoxAnnotation {
   timestamp?: number;
   /** Requires `timestamp`, and must be greater than or equal to it. */
   endTimestamp?: number;
+  /** Top-left corner as fractions of the frame, from 0 to 1. */
   coordinates: { x: number; y: number };
   /** Width and height as fractions of the frame. The box must fit in the frame. */
   dimensions: { width: number; height: number };
-  /** `#RRGGBB`. */
+  /** `#RRGGBB`, either case. */
   color: string;
-  /** Document page. Omit for an image or video. */
+  /** Document page, from 1. Required on a document or PDF. Omit for an image or video. */
   pageNumber?: number;
 }
 
 export interface PencilAnnotation {
   type: "pencil";
+  /** Seconds into a video. Omit for a still image. */
   timestamp?: number;
+  /** Requires `timestamp`, and must be greater than or equal to it. */
   endTimestamp?: number;
+  /** 1 to 10 lines. */
   lines: PencilLine[];
 }
 
 export interface PencilLine {
+  /** 2 to 1000 points, each a fraction of the frame from 0 to 1. */
   coordinates: { x: number; y: number }[];
+  /** Greater than 0 and at most 1000. */
   lineWidth: number;
+  /** `#RRGGBB`, either case. */
   color: string;
+  /** Document page, from 1. Required on a document or PDF. Omit for an image or video. */
   pageNumber?: number;
 }
 
@@ -125,24 +133,29 @@ export interface DiscussionCreateParams {
   assetId: string;
   /** Required. There is no default to the current version. */
   assetVersionId: string;
+  /** Plain text, 1 to 500 characters. Mention someone with `{{mention:N}}`. */
   body: string;
-  mentions?: DiscussionMentionInput[];
+  /** At most 10. `null` is the same as omitting it. */
+  mentions?: DiscussionMentionInput[] | null;
+  /** At most 10. */
   annotations?: DiscussionAnnotation[];
 }
 
 export interface DiscussionCommentCreateParams {
+  /** Plain text, 1 to 500 characters. Mention someone with `{{mention:N}}`. */
   body: string;
-  mentions?: DiscussionMentionInput[];
+  /** At most 10. `null` is the same as omitting it. */
+  mentions?: DiscussionMentionInput[] | null;
 }
 
 export interface DiscussionCommentUpdateParams {
   body: string;
   /**
    * Required when the stored comment has mentions. Send the mentions again to
-   * keep them, or `[]` to remove them. Omitting this field on a comment that
-   * has mentions is 409.
+   * keep them, or `[]` to remove them. Omitting this field, or sending `null`,
+   * on a comment that has mentions is 409.
    */
-  mentions?: DiscussionMentionInput[];
+  mentions?: DiscussionMentionInput[] | null;
 }
 
 export interface DiscussionUpdateParams {

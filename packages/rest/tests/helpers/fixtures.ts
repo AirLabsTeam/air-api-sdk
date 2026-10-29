@@ -211,7 +211,7 @@ export function makeMember(overrides: Partial<Member> = {}): Member {
     firstName: "Ada",
     lastName: "Lovelace",
     email: "ada@example.com",
-    firstJoinedAt: "2024-03-01T12:00:00.000Z",
+    firstJoinedAt: "2024-03-01 12:00:00.123456+00",
     ...overrides,
   };
 }
