@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.11.0
+
+### Minor Changes
+
+- 79a1596: Add `discussions` (`list`, `get`, `listComments`, `create`, `createComment`, `update`, `updateComment`, `deleteComment`) and `members.list` for the public discussion and member routes.
+
+### Patch Changes
+
+- @air/api-core@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes
