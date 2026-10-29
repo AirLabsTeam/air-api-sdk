@@ -36,6 +36,8 @@ export { Showcases } from "./resources/showcases";
 export { Libraries } from "./resources/libraries";
 export { Tags } from "./resources/tags";
 export { CustomFields } from "./resources/custom-fields";
+export { Discussions } from "./resources/discussions";
+export { Members } from "./resources/members";
 export { Roles } from "./resources/roles";
 export { Imports } from "./resources/imports";
 export { Uploads } from "./resources/uploads";

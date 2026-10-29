@@ -4,6 +4,8 @@ export * from "./showcases";
 export * from "./libraries";
 export * from "./tags";
 export * from "./custom-fields";
+export * from "./discussions";
+export * from "./members";
 export * from "./roles";
 export * from "./imports";
 export * from "./uploads";

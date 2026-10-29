@@ -62,6 +62,8 @@ const air = new AirApi({
 - Assets: `air.assets.*` (list, get, delete, versions, custom fields, tags, CDN links, share links)
 - Tags: `air.tags.*` (list, get, create, update, delete)
 - Custom fields: `air.customFields.*` (list, create, update, delete, values)
+- Discussions: `air.discussions.*` (list, get, listComments, create, createComment, update, updateComment, deleteComment)
+- Members: `air.members.list`
 - Roles: `air.roles.*` (list)
 - Uploads: `air.uploads.*` (uploadFile with progress tracking, multipart for large files)
 - Imports: `air.imports.*` (create, getStatus)

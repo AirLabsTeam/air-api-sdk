@@ -393,6 +393,67 @@ const roles = await air.roles.list({ type: "guest" });
 // Returns: [{ id, name, description, billable, type }]
 ```
 
+### Discussions
+
+Reads require `comments.read`. Writes require `comments.write`.
+
+```ts
+// One of assetId or boardId. They cannot be combined.
+// Pages don't overlap. With the default lastCommentedAt sort, a reply between
+// pages can move a discussion, so it may repeat or be skipped. For a stable
+// walk, use sortBy: "createdAt" and sortDirection: "asc".
+const page = await air.discussions.list({
+  assetId: "asset-id",
+  sortBy: "createdAt",
+  sortDirection: "asc",
+});
+
+const discussion = await air.discussions.get(page.data[0].id);
+
+// discussion.comments holds the first 10 comments. Its cursor is accepted here.
+const comments = await air.discussions.listComments(discussion.id, {
+  cursor: discussion.comments.pagination.cursor,
+});
+
+// assetVersionId is required. There is no board on create.
+// Mention someone with {{mention:N}} and mentions[N].accountId.
+// That accountId is members.list id, and mentions[].id on the response.
+const created = await air.discussions.create({
+  assetId: "asset-id",
+  assetVersionId: "version-id",
+  body: "Please review {{mention:0}}",
+  mentions: [{ accountId: "account-id" }],
+});
+
+const reply = await air.discussions.createComment(created.id, { body: "Looks good" });
+
+// Resolve, edit, and delete return an empty body.
+await air.discussions.update(created.id, { resolved: true });
+// Omitting mentions (or sending null) when the comment has them is 409.
+// [] removes them.
+await air.discussions.updateComment(created.id, reply.id, {
+  body: "Updated",
+  mentions: [],
+});
+await air.discussions.deleteComment(created.id, reply.id);
+```
+
+`boardId` on a discussion is present only when the stored board is active and the caller can view it. In a workspace that does not scope comments to boards, `boardId` on the list returns discussions on assets currently on that board, including ones started on another board. Comment `body` is user-generated. `updatedAt` equals `createdAt` until the comment is edited. Deleting the last comment deletes the discussion.
+
+### Members
+
+Requires `members.read`. `workspace.read` does not grant it. Any workspace member can list every type. Board guests and library-only members cannot.
+
+```ts
+const members = await air.members.list({ type: "member", search: "ada", limit: 50 });
+
+// email without type searches member, guest, and libraryMember.
+// An unknown email is an empty list.
+const byEmail = await air.members.list({ email: "ada@example.com" });
+```
+
+`id` is the account id used as `mentions[].accountId` when writing a comment. `firstJoinedAt` is the first time that person joined. It is the stored Postgres timestamp text (`2024-03-01 12:00:00.123456+00`), not ISO 8601, with up to 6 fraction digits and a UTC offset, so don't parse a fixed width. Sort is fixed: `firstJoinedAt` ascending, then `id`. `email` and `search` cannot be combined. The cursor must be sent with the same filters.
+
 ### Uploads
 
 ```ts
