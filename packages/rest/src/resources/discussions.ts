@@ -110,8 +110,10 @@ export class Discussions {
 
   /**
    * Replace a comment's text and mentions. Only the author can edit.
-   * The response is empty, and the edit notifies no one. Omitting `mentions`,
-   * or sending `null`, when the comment has them is 409. `[]` removes them.
+   * The response is empty, and the edit notifies no one. An edit that leaves
+   * the text and mentions as they are changes nothing and keeps `updatedAt`.
+   * Omitting `mentions`, or sending `null`, when the comment has them is 409.
+   * `[]` removes them.
    */
   async updateComment(
     discussionId: string,

@@ -74,8 +74,8 @@ export interface DiscussionComment {
   body: string;
   createdAt: string;
   /**
-   * Equal to `createdAt` until the first edit. An edit is
-   * `updatedAt !== createdAt`.
+   * Equal to `createdAt` until the first edit that changes the stored text.
+   * An edit is `updatedAt !== createdAt`.
    */
   updatedAt: string;
   author: DiscussionAuthor;

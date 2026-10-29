@@ -132,6 +132,7 @@ export function makePinnedShareLink(
 }
 
 export function makeCdnLink(overrides: Partial<CdnLink> = {}): CdnLink {
+  // A partial spread over the followsDefaultVersion union does not narrow.
   return {
     id: "cdn-link-1",
     url: "https://cdn.example.com/cdn-link-1",
@@ -141,7 +142,7 @@ export function makeCdnLink(overrides: Partial<CdnLink> = {}): CdnLink {
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
     ...overrides,
-  };
+  } as CdnLink;
 }
 
 export function makeCustomField(overrides: Partial<CustomField> = {}): CustomField {

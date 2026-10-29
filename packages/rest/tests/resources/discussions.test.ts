@@ -30,6 +30,25 @@ describe("Discussions", () => {
     expect(url).not.toContain("boardId");
   });
 
+  test("list rejects a missing, doubled, or version-only filter at compile time", () => {
+    const client = new AirApi(
+      createClientOptions(createMockFetch({ body: makePaginatedResponse([]) })),
+    );
+    // Never called. `npm run typecheck` checks these lines and fails on any
+    // expected error that stops occurring, so the union cannot loosen quietly.
+    const typeOnly = () => {
+      // @ts-expect-error one of assetId or boardId is required
+      void client.discussions.list();
+      // @ts-expect-error one of assetId or boardId is required
+      void client.discussions.list({});
+      // @ts-expect-error assetId and boardId cannot be combined
+      void client.discussions.list({ assetId: "asset-1", boardId: "board-1" });
+      // @ts-expect-error assetVersionId requires assetId
+      void client.discussions.list({ boardId: "board-1", assetVersionId: "version-1" });
+    };
+    expect(typeOnly).toBeTypeOf("function");
+  });
+
   test("get returns one discussion", async () => {
     const discussion = makeDiscussion();
     const mockFetch = createMockFetch({ body: discussion });
