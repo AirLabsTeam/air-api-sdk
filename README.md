@@ -399,8 +399,9 @@ Reads require `comments.read`. Writes require `comments.write`.
 
 ```ts
 // One of assetId or boardId. They cannot be combined.
-// The next page repeats the discussion the cursor points at, so de-duplicate
-// by id. createdAt stays put; lastCommentedAt (the default) moves on reply.
+// Pages don't overlap. With the default lastCommentedAt sort, a reply between
+// pages can move a discussion, so it may repeat or be skipped. For a stable
+// walk, use sortBy: "createdAt" and sortDirection: "asc".
 const page = await air.discussions.list({
   assetId: "asset-id",
   sortBy: "createdAt",

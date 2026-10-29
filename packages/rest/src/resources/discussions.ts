@@ -15,13 +15,13 @@ export class Discussions {
 
   /**
    * List discussions on an asset or on the assets currently in a board.
-   * One of `assetId` or `boardId` is required. They cannot be combined.
+   * Exactly one of `assetId` or `boardId` is required.
    *
-   * The next page repeats the discussion the cursor points at, so
-   * de-duplicate by `id`. For an export, use `sortBy: "createdAt"` and
-   * `sortDirection: "asc"`. `lastCommentedAt` moves when someone replies.
+   * Pages don't overlap. With the default `lastCommentedAt` sort, a reply
+   * between pages can move a discussion, so it may repeat or be skipped. For
+   * a stable walk, use `sortBy: "createdAt"` and `sortDirection: "asc"`.
    */
-  list(params: DiscussionListParams = {}): PagePromise<Discussion> {
+  list(params: DiscussionListParams): PagePromise<Discussion> {
     const query: Record<string, QueryParam> = {
       assetId: params.assetId,
       assetVersionId: params.assetVersionId,

@@ -1,12 +1,27 @@
 import type { CursorPageParams } from "@air/api-core";
 
-export interface DiscussionListParams extends CursorPageParams {
-  /** Discussions on this asset. Required unless `boardId` is set. */
-  assetId?: string;
-  /** Limit an asset list to this version. Requires `assetId`. */
-  assetVersionId?: string;
-  /** Discussions on assets currently on this board. Required unless `assetId` is set. */
-  boardId?: string;
+/**
+ * Exactly one of `assetId` or `boardId`. `assetVersionId` requires `assetId`.
+ * The server rejects any other combination, so the type does too.
+ */
+export type DiscussionListParams = DiscussionListOptions &
+  (
+    | {
+        /** Discussions on this asset. */
+        assetId: string;
+        /** Limit the asset list to this version. */
+        assetVersionId?: string;
+        boardId?: never;
+      }
+    | {
+        /** Discussions on assets currently on this board. */
+        boardId: string;
+        assetId?: never;
+        assetVersionId?: never;
+      }
+  );
+
+export interface DiscussionListOptions extends CursorPageParams {
   /** When set, only discussions in that resolved state. */
   resolved?: boolean;
   /**
@@ -102,7 +117,7 @@ export interface BoxAnnotation {
   coordinates: { x: number; y: number };
   /** Width and height as fractions of the frame. The box must fit in the frame. */
   dimensions: { width: number; height: number };
-  /** `#RRGGBB`, either case. */
+  /** `#RRGGBB`, either case, on write. A stored annotation read back may use another color format. */
   color: string;
   /** Document page, from 1. Required on a document or PDF. Omit for an image or video. */
   pageNumber?: number;
@@ -123,7 +138,7 @@ export interface PencilLine {
   coordinates: { x: number; y: number }[];
   /** Greater than 0 and at most 1000. */
   lineWidth: number;
-  /** `#RRGGBB`, either case. */
+  /** `#RRGGBB`, either case, on write. A stored annotation read back may use another color format. */
   color: string;
   /** Document page, from 1. Required on a document or PDF. Omit for an image or video. */
   pageNumber?: number;
