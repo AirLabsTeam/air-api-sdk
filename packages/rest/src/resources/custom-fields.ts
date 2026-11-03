@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type {
   CustomField,
   CustomFieldCreateParams,
@@ -26,7 +26,7 @@ export class CustomFields {
   async get(customFieldId: string): Promise<CustomField> {
     return this.client.request<CustomField>({
       method: "GET",
-      path: `/customfields/${customFieldId}`,
+      path: encodePath`/customfields/${customFieldId}`,
     });
   }
 
@@ -41,7 +41,7 @@ export class CustomFields {
   async update(customFieldId: string, params: CustomFieldUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/customfields/${customFieldId}`,
+      path: encodePath`/customfields/${customFieldId}`,
       body: params,
     });
   }
@@ -49,7 +49,7 @@ export class CustomFields {
   async delete(customFieldId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/customfields/${customFieldId}`,
+      path: encodePath`/customfields/${customFieldId}`,
     });
   }
 
@@ -59,7 +59,7 @@ export class CustomFields {
   ): Promise<CustomFieldValue> {
     return this.client.request<CustomFieldValue>({
       method: "POST",
-      path: `/customfields/${customFieldId}/values`,
+      path: encodePath`/customfields/${customFieldId}/values`,
       body: params,
     });
   }
@@ -71,7 +71,7 @@ export class CustomFields {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/customfields/${customFieldId}/values/${valueId}`,
+      path: encodePath`/customfields/${customFieldId}/values/${valueId}`,
       body: params,
     });
   }
@@ -79,7 +79,7 @@ export class CustomFields {
   async deleteValue(customFieldId: string, valueId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/customfields/${customFieldId}/values/${valueId}`,
+      path: encodePath`/customfields/${customFieldId}/values/${valueId}`,
     });
   }
 }

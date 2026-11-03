@@ -1,4 +1,4 @@
-import type { AirBase } from "@air/api-core";
+import { encodePath, type AirBase } from "@air/api-core";
 import type {
   ImportCreateParams,
   ImportCreateResponse,
@@ -19,7 +19,7 @@ export class Imports {
   async getStatus(importId: string): Promise<ImportStatusResponse> {
     return this.client.request<ImportStatusResponse>({
       method: "GET",
-      path: `/imports/${importId}/status`,
+      path: encodePath`/imports/${importId}/status`,
     });
   }
 }

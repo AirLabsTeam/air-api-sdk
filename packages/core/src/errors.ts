@@ -108,3 +108,11 @@ export class TimeoutError extends ConnectionError {
     this.name = "TimeoutError";
   }
 }
+
+/** A request path that could reach another route. Thrown before anything is sent. */
+export class InvalidRequestPathError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidRequestPathError";
+  }
+}

@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type { Tag, TagCreateParams, TagListParams, TagUpdateParams } from "../types/tags";
 
 export class Tags {
@@ -18,7 +18,7 @@ export class Tags {
   async get(tagId: string): Promise<Tag> {
     return this.client.request<Tag>({
       method: "GET",
-      path: `/tags/${tagId}`,
+      path: encodePath`/tags/${tagId}`,
     });
   }
 
@@ -33,7 +33,7 @@ export class Tags {
   async update(tagId: string, params: TagUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/tags/${tagId}`,
+      path: encodePath`/tags/${tagId}`,
       body: params,
     });
   }
@@ -41,7 +41,7 @@ export class Tags {
   async delete(tagId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/tags/${tagId}`,
+      path: encodePath`/tags/${tagId}`,
     });
   }
 }

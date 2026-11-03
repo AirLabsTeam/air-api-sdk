@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type {
   Library,
   LibraryCreateParams,
@@ -25,7 +25,7 @@ export class Libraries {
   async get(libraryId: string): Promise<Library> {
     return this.client.request<Library>({
       method: "GET",
-      path: `/libraries/${libraryId}`,
+      path: encodePath`/libraries/${libraryId}`,
     });
   }
 
@@ -40,7 +40,7 @@ export class Libraries {
   async update(libraryId: string, params: LibraryUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/libraries/${libraryId}`,
+      path: encodePath`/libraries/${libraryId}`,
       body: params,
     });
   }
@@ -48,7 +48,7 @@ export class Libraries {
   async delete(libraryId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/libraries/${libraryId}`,
+      path: encodePath`/libraries/${libraryId}`,
     });
   }
 }

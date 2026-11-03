@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type {
   AddShowcaseAssetsParams,
   AddShowcaseBoardsParams,
@@ -59,7 +59,7 @@ export class Showcases {
   async get(showcaseId: string): Promise<Showcase> {
     return this.client.request<Showcase>({
       method: "GET",
-      path: `/showcases/${showcaseId}`,
+      path: encodePath`/showcases/${showcaseId}`,
     });
   }
 
@@ -86,7 +86,7 @@ export class Showcases {
   async update(showcaseId: string, params: ShowcaseUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/showcases/${showcaseId}`,
+      path: encodePath`/showcases/${showcaseId}`,
       body: params,
     });
   }
@@ -105,7 +105,7 @@ export class Showcases {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/showcases/${showcaseId}/share-links/${shareLinkId}`,
+      path: encodePath`/showcases/${showcaseId}/share-links/${shareLinkId}`,
       body: params,
     });
   }
@@ -119,7 +119,7 @@ export class Showcases {
   async addAssets(showcaseId: string, params: AddShowcaseAssetsParams): Promise<void> {
     return this.client.request<void>({
       method: "POST",
-      path: `/showcases/${showcaseId}/assets`,
+      path: encodePath`/showcases/${showcaseId}/assets`,
       body: params,
     });
   }
@@ -133,7 +133,7 @@ export class Showcases {
   async removeAsset(showcaseId: string, assetId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/showcases/${showcaseId}/assets/${assetId}`,
+      path: encodePath`/showcases/${showcaseId}/assets/${assetId}`,
     });
   }
 
@@ -146,7 +146,7 @@ export class Showcases {
   async addBoards(showcaseId: string, params: AddShowcaseBoardsParams): Promise<void> {
     return this.client.request<void>({
       method: "POST",
-      path: `/showcases/${showcaseId}/boards`,
+      path: encodePath`/showcases/${showcaseId}/boards`,
       body: params,
     });
   }
@@ -160,7 +160,7 @@ export class Showcases {
   async removeBoard(showcaseId: string, boardId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/showcases/${showcaseId}/boards/${boardId}`,
+      path: encodePath`/showcases/${showcaseId}/boards/${boardId}`,
     });
   }
 }

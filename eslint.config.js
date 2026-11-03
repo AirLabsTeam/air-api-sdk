@@ -14,6 +14,11 @@ const nodeGlobals = {
   clearInterval: "readonly",
 };
 
+const unsafeRequestPath =
+  ":not(Literal, TemplateLiteral[expressions.length=0], TaggedTemplateExpression[tag.name='encodePath'], ConditionalExpression[consequent.type='Literal'][alternate.type='Literal'])";
+const unsafeRequestPathMessage =
+  "A request path is a static string or encodePath`...`, so each id stays one segment.";
+
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -30,6 +35,22 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-this-alias": "off",
+    },
+  },
+  {
+    files: ["packages/*/src/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: `ObjectExpression > Property:matches([key.name='path'], [key.value='path']) > .value${unsafeRequestPath}`,
+          message: unsafeRequestPathMessage,
+        },
+        {
+          selector: `AssignmentExpression:matches([left.property.name='path'], [left.property.value='path']) > .right${unsafeRequestPath}`,
+          message: unsafeRequestPathMessage,
+        },
+      ],
     },
   },
   {

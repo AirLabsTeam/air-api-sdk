@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type { Board } from "../types/boards";
 import type {
   AddVersionTagParams,
@@ -67,28 +67,28 @@ export class Assets {
   async get(assetId: string): Promise<Asset> {
     return this.client.request<Asset>({
       method: "GET",
-      path: `/assets/${assetId}`,
+      path: encodePath`/assets/${assetId}`,
     });
   }
 
   async delete(assetId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/assets/${assetId}`,
+      path: encodePath`/assets/${assetId}`,
     });
   }
 
   async listCdnLinks(assetId: string): Promise<AssetCdnLinkListResponse> {
     return this.client.request<AssetCdnLinkListResponse>({
       method: "GET",
-      path: `/assets/${assetId}/cdnLinks`,
+      path: encodePath`/assets/${assetId}/cdnLinks`,
     });
   }
 
   async createCdnLink(assetId: string, params: AssetCdnLinkCreateParams): Promise<CdnLink> {
     return this.client.request<CdnLink>({
       method: "POST",
-      path: `/assets/${assetId}/cdnLinks`,
+      path: encodePath`/assets/${assetId}/cdnLinks`,
       body: params,
     });
   }
@@ -100,7 +100,7 @@ export class Assets {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/assets/${assetId}/cdnLinks/${cdnLinkId}`,
+      path: encodePath`/assets/${assetId}/cdnLinks/${cdnLinkId}`,
       body: params,
     });
   }
@@ -112,7 +112,7 @@ export class Assets {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PUT",
-      path: `/assets/${assetId}/customfields/${customFieldId}`,
+      path: encodePath`/assets/${assetId}/customfields/${customFieldId}`,
       body: params,
     });
   }
@@ -120,14 +120,14 @@ export class Assets {
   async listVersions(assetId: string): Promise<AssetVersionListResponse> {
     return this.client.request<AssetVersionListResponse>({
       method: "GET",
-      path: `/assets/${assetId}/versions`,
+      path: encodePath`/assets/${assetId}/versions`,
     });
   }
 
   async getVersion(assetId: string, versionId: string): Promise<AssetVersion> {
     return this.client.request<AssetVersion>({
       method: "GET",
-      path: `/assets/${assetId}/versions/${versionId}`,
+      path: encodePath`/assets/${assetId}/versions/${versionId}`,
     });
   }
 
@@ -138,7 +138,7 @@ export class Assets {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/assets/${assetId}/versions/${versionId}`,
+      path: encodePath`/assets/${assetId}/versions/${versionId}`,
       body: params,
     });
   }
@@ -149,7 +149,7 @@ export class Assets {
   ): Promise<AssetVersionDownloadUrl> {
     return this.client.request<AssetVersionDownloadUrl>({
       method: "GET",
-      path: `/assets/${assetId}/versions/${versionId}/download`,
+      path: encodePath`/assets/${assetId}/versions/${versionId}/download`,
     });
   }
 
@@ -160,7 +160,7 @@ export class Assets {
   ): Promise<AssetVersion> {
     return this.client.request<AssetVersion>({
       method: "POST",
-      path: `/assets/${assetId}/versions/${versionId}/tags`,
+      path: encodePath`/assets/${assetId}/versions/${versionId}/tags`,
       body: params,
     });
   }
@@ -168,7 +168,7 @@ export class Assets {
   async removeVersionTag(assetId: string, versionId: string, tagId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/assets/${assetId}/versions/${versionId}/tags/${tagId}`,
+      path: encodePath`/assets/${assetId}/versions/${versionId}/tags/${tagId}`,
     });
   }
 
@@ -182,7 +182,7 @@ export class Assets {
     };
 
     return this.client.requestCursorPage<AssetShareLink>(
-      { method: "GET", path: `/assets/${assetId}/share-links`, query },
+      { method: "GET", path: encodePath`/assets/${assetId}/share-links`, query },
       query,
     );
   }
@@ -193,7 +193,7 @@ export class Assets {
   ): Promise<AssetShareLink> {
     return this.client.request<AssetShareLink>({
       method: "POST",
-      path: `/assets/${assetId}/share-links`,
+      path: encodePath`/assets/${assetId}/share-links`,
       body: params,
     });
   }
@@ -205,7 +205,7 @@ export class Assets {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/assets/${assetId}/share-links/${shareLinkId}`,
+      path: encodePath`/assets/${assetId}/share-links/${shareLinkId}`,
       body: params,
     });
   }
@@ -221,7 +221,7 @@ export class Assets {
     }
 
     return this.client.requestCursorPage<Board>(
-      { method: "GET", path: `/assets/${assetId}/boards`, query },
+      { method: "GET", path: encodePath`/assets/${assetId}/boards`, query },
       query,
     );
   }

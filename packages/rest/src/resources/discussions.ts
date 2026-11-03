@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type {
   Discussion,
   DiscussionComment,
@@ -43,7 +43,7 @@ export class Discussions {
   async get(discussionId: string): Promise<Discussion> {
     return this.client.request<Discussion>({
       method: "GET",
-      path: `/discussions/${discussionId}`,
+      path: encodePath`/discussions/${discussionId}`,
     });
   }
 
@@ -61,7 +61,7 @@ export class Discussions {
     };
 
     return this.client.requestCursorPage<DiscussionComment>(
-      { method: "GET", path: `/discussions/${discussionId}/comments`, query },
+      { method: "GET", path: encodePath`/discussions/${discussionId}/comments`, query },
       query,
     );
   }
@@ -91,7 +91,7 @@ export class Discussions {
   ): Promise<DiscussionComment> {
     return this.client.request<DiscussionComment>({
       method: "POST",
-      path: `/discussions/${discussionId}/comments`,
+      path: encodePath`/discussions/${discussionId}/comments`,
       body: params,
     });
   }
@@ -103,7 +103,7 @@ export class Discussions {
   async update(discussionId: string, params: DiscussionUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/discussions/${discussionId}`,
+      path: encodePath`/discussions/${discussionId}`,
       body: params,
     });
   }
@@ -122,7 +122,7 @@ export class Discussions {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/discussions/${discussionId}/comments/${commentId}`,
+      path: encodePath`/discussions/${discussionId}/comments/${commentId}`,
       body: params,
     });
   }
@@ -134,7 +134,7 @@ export class Discussions {
   async deleteComment(discussionId: string, commentId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/discussions/${discussionId}/comments/${commentId}`,
+      path: encodePath`/discussions/${discussionId}/comments/${commentId}`,
     });
   }
 }

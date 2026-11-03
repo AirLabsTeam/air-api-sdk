@@ -652,6 +652,16 @@ try {
 
 Retryable errors (408, 429, 500, 502, 503, 504) are automatically retried with exponential backoff up to `maxRetries` times.
 
+### Invalid request paths
+
+A request whose path would reach another route throws `InvalidRequestPathError` before anything is sent: an empty or missing id, or an id that is `.` or `..`. It does not extend `APIError` and is never retried. When you call `request` with your own path, build it with `encodePath` so each id stays one segment, even one that contains `/`, `?` or `#`:
+
+```ts
+import { encodePath } from "@air/api-sdk";
+
+await air.request({ method: "GET", path: encodePath`/assets/${assetId}` });
+```
+
 ## Development
 
 ### Prerequisites
