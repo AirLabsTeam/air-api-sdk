@@ -1,4 +1,4 @@
-import type { AirBase, PagePromise, QueryParam } from "@air/api-core";
+import { encodePath, type AirBase, type PagePromise, type QueryParam } from "@air/api-core";
 import type {
   AddBoardAssetsParams,
   AddGuestParams,
@@ -43,7 +43,7 @@ export class Boards {
   async get(boardId: string): Promise<Board> {
     return this.client.request<Board>({
       method: "GET",
-      path: `/boards/${boardId}`,
+      path: encodePath`/boards/${boardId}`,
     });
   }
 
@@ -58,7 +58,7 @@ export class Boards {
   async update(boardId: string, params: BoardUpdateParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/boards/${boardId}`,
+      path: encodePath`/boards/${boardId}`,
       body: params,
     });
   }
@@ -66,14 +66,14 @@ export class Boards {
   async delete(boardId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/boards/${boardId}`,
+      path: encodePath`/boards/${boardId}`,
     });
   }
 
   async addAssets(boardId: string, params: AddBoardAssetsParams): Promise<void> {
     return this.client.request<void>({
       method: "POST",
-      path: `/boards/${boardId}/assets`,
+      path: encodePath`/boards/${boardId}/assets`,
       body: params,
     });
   }
@@ -81,7 +81,7 @@ export class Boards {
   async removeAsset(boardId: string, assetId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/boards/${boardId}/assets/${assetId}`,
+      path: encodePath`/boards/${boardId}/assets/${assetId}`,
     });
   }
 
@@ -92,7 +92,7 @@ export class Boards {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PUT",
-      path: `/boards/${boardId}/customFields/${customFieldId}`,
+      path: encodePath`/boards/${boardId}/customFields/${customFieldId}`,
       body: params,
     });
   }
@@ -100,7 +100,7 @@ export class Boards {
   async listShareLinks(boardId: string): Promise<BoardShareLinkListResponse> {
     return this.client.request<BoardShareLinkListResponse>({
       method: "GET",
-      path: `/boards/${boardId}/share-links`,
+      path: encodePath`/boards/${boardId}/share-links`,
     });
   }
 
@@ -110,7 +110,7 @@ export class Boards {
   ): Promise<BoardShareLink> {
     return this.client.request<BoardShareLink>({
       method: "POST",
-      path: `/boards/${boardId}/share-links`,
+      path: encodePath`/boards/${boardId}/share-links`,
       body: params,
     });
   }
@@ -122,7 +122,7 @@ export class Boards {
   ): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/boards/${boardId}/share-links/${shareLinkId}`,
+      path: encodePath`/boards/${boardId}/share-links/${shareLinkId}`,
       body: params,
     });
   }
@@ -130,7 +130,7 @@ export class Boards {
   async addGuest(boardId: string, params: AddGuestParams): Promise<Guest> {
     return this.client.request<Guest>({
       method: "POST",
-      path: `/boards/${boardId}/guests`,
+      path: encodePath`/boards/${boardId}/guests`,
       body: params,
     });
   }
@@ -138,7 +138,7 @@ export class Boards {
   async listGuests(boardId: string, params: GuestListParams = {}): Promise<Guest[]> {
     const response = await this.client.request<GuestListResponse>({
       method: "GET",
-      path: `/boards/${boardId}/guests`,
+      path: encodePath`/boards/${boardId}/guests`,
       query: params.email ? { email: params.email } : undefined,
     });
     return response.data;
@@ -147,7 +147,7 @@ export class Boards {
   async updateGuest(boardId: string, guestId: string, params: UpdateGuestParams): Promise<void> {
     return this.client.request<void>({
       method: "PATCH",
-      path: `/boards/${boardId}/guests/${guestId}`,
+      path: encodePath`/boards/${boardId}/guests/${guestId}`,
       body: params,
     });
   }
@@ -155,7 +155,7 @@ export class Boards {
   async removeGuest(boardId: string, guestId: string): Promise<void> {
     return this.client.request<void>({
       method: "DELETE",
-      path: `/boards/${boardId}/guests/${guestId}`,
+      path: encodePath`/boards/${boardId}/guests/${guestId}`,
     });
   }
 }

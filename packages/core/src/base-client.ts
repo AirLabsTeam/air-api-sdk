@@ -1,5 +1,6 @@
 import { APIError, ConnectionError, TimeoutError } from "./errors";
 import { CursorPage, PagePromise } from "./pagination";
+import { toRequestPath } from "./path";
 import type { QueryParam, RequestOptions } from "./request-options";
 import { retryWithBackoff } from "./retry";
 import type { CursorPageResponse } from "./types";
@@ -84,8 +85,10 @@ export class AirBase {
   }
 
   async request<T>(options: RequestOptions): Promise<T> {
+    // eslint-disable-next-line no-restricted-syntax -- the one place a raw path is checked
+    const checked = { ...options, path: toRequestPath(options.path) };
     return retryWithBackoff(
-      () => this._executeRequest<T>(options),
+      () => this._executeRequest<T>(checked),
       this.maxRetries,
       options.method,
     );

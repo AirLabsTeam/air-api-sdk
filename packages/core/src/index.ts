@@ -6,6 +6,7 @@ export {
   BadRequestError,
   ConnectionError,
   InternalServerError,
+  InvalidRequestPathError,
   NotFoundError,
   PermissionError,
   RateLimitError,
@@ -13,6 +14,8 @@ export {
 } from "./errors";
 
 export { CursorPage, PagePromise } from "./pagination";
+
+export { encodePath } from "./path";
 
 export type { QueryParam, RequestOptions } from "./request-options";
 
