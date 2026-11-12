@@ -26,6 +26,7 @@ npm install @air/api-rest
 - Showcases: `list`, `get`, `create`, `update`, `updateShareLink`, `addAssets`, `removeAsset`, `addBoards`, `removeBoard`, plus a `showcaseId` filter on `assets.list` and `boards.list`
 - Asset CDN link helpers: `listCdnLinks`, `createCdnLink`, and `updateCdnLink`
 - Share links: `listShareLinks`, `createShareLink`, and `updateShareLink` on assets and boards
+- Forms on a board: `listForms`, `createForm`, `updateForm`, `listFormShareLinks`, `createFormShareLink`, `updateFormShareLink`, and `deleteFormShareLink`
 - Full TypeScript types for all API request/response shapes
 - `AirApi` client class that composes all resources
 

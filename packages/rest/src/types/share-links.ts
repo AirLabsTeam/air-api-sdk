@@ -13,7 +13,7 @@ export type ShareLinkCommentsAccess = "hidden" | "read_only" | "allowed";
 export type ShareLinkCustomFieldsAccess = "hidden" | "read_only" | "editable";
 
 /**
- * Public share link fields shared by assets, boards, and showcases.
+ * Public share link fields shared by assets, boards, showcases, and forms.
  * `url` is the link to give to people. The password is never returned;
  * `hasPassword` says whether one is set. Disabled links are included
  * with `active: false`.

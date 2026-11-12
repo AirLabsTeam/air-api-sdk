@@ -1,5 +1,6 @@
 import type { Asset, AssetVersion, CdnLink } from "../../src/types/assets";
 import type { Board } from "../../src/types/boards";
+import type { Form } from "../../src/types/forms";
 import type { Showcase } from "../../src/types/showcases";
 import type { AssetShareLink, ShareLink } from "../../src/types/share-links";
 import type { Library } from "../../src/types/libraries";
@@ -26,6 +27,22 @@ export function makeBoard(overrides: Partial<Board> = {}): Board {
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
     customFields: undefined,
+    ...overrides,
+  };
+}
+
+export function makeForm(overrides: Partial<Form> = {}): Form {
+  return {
+    id: "form-1",
+    title: "Spring deliveries",
+    createSubmissionBoard: false,
+    autoSubmit: false,
+    fields: [
+      { type: "title", required: true },
+      { type: "description", required: false },
+    ],
+    createdAt: "2026-10-14T15:00:00.000Z",
+    updatedAt: "2026-10-14T15:00:00.000Z",
     ...overrides,
   };
 }

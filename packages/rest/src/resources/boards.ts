@@ -13,6 +13,16 @@ import type {
   UpdateGuestParams,
 } from "../types/boards";
 import type {
+  Form,
+  FormCreateParams,
+  FormListResponse,
+  FormShareLink,
+  FormShareLinkCreateParams,
+  FormShareLinkListResponse,
+  FormShareLinkUpdateParams,
+  FormUpdateParams,
+} from "../types/forms";
+import type {
   BoardShareLink,
   BoardShareLinkCreateParams,
   BoardShareLinkListResponse,
@@ -124,6 +134,68 @@ export class Boards {
       method: "PATCH",
       path: encodePath`/boards/${boardId}/share-links/${shareLinkId}`,
       body: params,
+    });
+  }
+
+  async listForms(boardId: string): Promise<FormListResponse> {
+    return this.client.request<FormListResponse>({
+      method: "GET",
+      path: encodePath`/boards/${boardId}/forms`,
+    });
+  }
+
+  async createForm(boardId: string, params: FormCreateParams): Promise<Form> {
+    return this.client.request<Form>({
+      method: "POST",
+      path: encodePath`/boards/${boardId}/forms`,
+      body: params,
+    });
+  }
+
+  async updateForm(boardId: string, formId: string, params: FormUpdateParams): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: encodePath`/boards/${boardId}/forms/${formId}`,
+      body: params,
+    });
+  }
+
+  async listFormShareLinks(boardId: string, formId: string): Promise<FormShareLinkListResponse> {
+    return this.client.request<FormShareLinkListResponse>({
+      method: "GET",
+      path: encodePath`/boards/${boardId}/forms/${formId}/share-links`,
+    });
+  }
+
+  async createFormShareLink(
+    boardId: string,
+    formId: string,
+    params: FormShareLinkCreateParams = {},
+  ): Promise<FormShareLink> {
+    return this.client.request<FormShareLink>({
+      method: "POST",
+      path: encodePath`/boards/${boardId}/forms/${formId}/share-links`,
+      body: params,
+    });
+  }
+
+  async updateFormShareLink(
+    boardId: string,
+    formId: string,
+    shareLinkId: string,
+    params: FormShareLinkUpdateParams,
+  ): Promise<void> {
+    return this.client.request<void>({
+      method: "PATCH",
+      path: encodePath`/boards/${boardId}/forms/${formId}/share-links/${shareLinkId}`,
+      body: params,
+    });
+  }
+
+  async deleteFormShareLink(boardId: string, formId: string, shareLinkId: string): Promise<void> {
+    return this.client.request<void>({
+      method: "DELETE",
+      path: encodePath`/boards/${boardId}/forms/${formId}/share-links/${shareLinkId}`,
     });
   }
 
