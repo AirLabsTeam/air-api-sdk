@@ -57,7 +57,7 @@ const air = new AirApi({
 
 ## Resources
 
-- Boards: `air.boards.*` (list, get, create, update, delete, guests, custom fields, share links)
+- Boards: `air.boards.*` (list, get, create, update, delete, guests, custom fields, share links, forms)
 - Showcases: `air.showcases.*` (list, get, create, update, updateShareLink, addAssets, removeAsset, addBoards, removeBoard)
 - Assets: `air.assets.*` (list, get, delete, versions, custom fields, tags, CDN links, share links)
 - Tags: `air.tags.*` (list, get, create, update, delete)

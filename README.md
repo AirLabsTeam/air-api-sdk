@@ -173,6 +173,36 @@ await air.boards.updateShareLink(board.id, boardShareLink.id, {
   expiresAt: null,
 });
 
+// Content collection forms. A board has zero or one. Creating the form
+// does not create its share link. A second form is 409 FORM_ALREADY_EXISTS.
+// `description` is omitted when it is null, and `null` clears it.
+// `type: "customField"` requires `customFieldId`. Sending `fields` replaces
+// the set. Omitting `fields` on create applies the workspace default, and
+// `fields: []` stores none. Omitting `fields` on update leaves them.
+const form = await air.boards.createForm(board.id, {
+  title: "Spring deliveries",
+  description: "Upload finals by Friday.",
+  fields: [
+    { type: "title", required: true },
+    { type: "customField", customFieldId: "custom-field-id", required: true },
+  ],
+});
+await air.boards.updateForm(board.id, form.id, { autoSubmit: true });
+const { data: forms } = await air.boards.listForms(board.id);
+
+// The form's share link is the same shape as a board share link, including
+// `expiresAt: null` when the link does not expire. `url` uses `/d/<id>`.
+// List and create stay on the collection. Update and delete take the id
+// those calls return. A disabled link still counts as existing, so a second
+// create is 409. Delete removes the link. `active: false` disables it.
+// `allowDownload`, `comments`, and `customFields` come from the Content
+// Collection role. Sending them does not change that role. Password,
+// expiration, and requireAccount are stored on every plan.
+const formShareLink = await air.boards.createFormShareLink(board.id, form.id);
+// formShareLink.expiresAt is null when the link does not expire
+await air.boards.updateFormShareLink(board.id, form.id, formShareLink.id, { active: false });
+await air.boards.deleteFormShareLink(board.id, form.id, formShareLink.id);
+
 // Guest management
 const guest = await air.boards.addGuest(board.id, {
   email: "guest@example.com",
