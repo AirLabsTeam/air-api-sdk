@@ -1,32 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 import { AirApi } from "../../src/api";
 import type { FormShareLink } from "../../src/types/forms";
+import type { BoardShareLink } from "../../src/types/share-links";
 import { createMockFetch, createClientOptions } from "../helpers/mock-fetch";
 import { makeForm, makePaginatedResponse, makeShareLink } from "../helpers/fixtures";
-
-type HasKey<T, K extends string> = K extends keyof T ? true : false;
-
-type FormShareLinkHasNoAssetFields =
-  HasKey<FormShareLink, "followsDefaultVersion"> extends false
-    ? HasKey<FormShareLink, "versionId"> extends false
-      ? HasKey<FormShareLink, "showAllVersions"> extends false
-        ? true
-        : never
-      : never
-    : never;
-
-type FormShareLinkExpiresAt = FormShareLink["expiresAt"] extends string | null
-  ? null extends FormShareLink["expiresAt"]
-    ? string extends FormShareLink["expiresAt"]
-      ? true
-      : never
-    : never
-  : never;
-
-const formShareLinkTypeChecks: [FormShareLinkHasNoAssetFields, FormShareLinkExpiresAt] = [
-  true,
-  true,
-];
 
 function makeFormShareLink(overrides: Partial<FormShareLink> = {}): FormShareLink {
   return makeShareLink({
@@ -42,14 +19,11 @@ function makeFormShareLink(overrides: Partial<FormShareLink> = {}): FormShareLin
 
 describe("Forms", () => {
   test("a form share link is a board share link with expiresAt", () => {
-    const link = makeFormShareLink();
-    const expiresAt: string | null = link.expiresAt;
-
-    expect(formShareLinkTypeChecks).toEqual([true, true]);
-    expect(expiresAt).toBeNull();
-    expect("followsDefaultVersion" in link).toBe(false);
-    expect("versionId" in link).toBe(false);
-    expect("showAllVersions" in link).toBe(false);
+    expectTypeOf<FormShareLink>().toEqualTypeOf<BoardShareLink>();
+    expectTypeOf<FormShareLink["expiresAt"]>().toEqualTypeOf<string | null>();
+    expectTypeOf<FormShareLink>().not.toHaveProperty("followsDefaultVersion");
+    expectTypeOf<FormShareLink>().not.toHaveProperty("versionId");
+    expectTypeOf<FormShareLink>().not.toHaveProperty("showAllVersions");
   });
 
   test("listForms returns the board form", async () => {

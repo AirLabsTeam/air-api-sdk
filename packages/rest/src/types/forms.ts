@@ -1,9 +1,5 @@
 import type { CursorPageResponse } from "@air/api-core";
-import type {
-  BoardShareLink,
-  ShareLinkCommentsAccess,
-  ShareLinkCustomFieldsAccess,
-} from "./share-links";
+import type { BoardShareLink, ShareLinkWriteSettings } from "./share-links";
 
 /**
  * A field on a content collection form.
@@ -94,31 +90,19 @@ export interface FormShareLinkListResponse extends CursorPageResponse<FormShareL
 }
 
 /**
- * Settings for a form share link.
+ * Settings for a form share link. Same fields as `ShareLinkWriteSettings`.
  *
- * `password` is write only. `null` clears `password` and `expiresAt`.
- * An empty password is rejected. `expiresAt` is an ISO 8601 date-time in
- * the future, and `null` on update clears it. Omitted `requireAccount`
- * follows the workspace default for form links.
+ * Omitted fields follow the workspace Share Link Defaults for form links on
+ * create, and stay unchanged on update. `allowDownload`, `comments`, and
+ * `customFields` are on the response and come from the Content Collection
+ * role. Create and update accept them and do not store them, so sending a
+ * different value does not change the role.
  *
- * `allowDownload`, `comments`, and `customFields` are on the response and
- * come from the Content Collection role. Create and update accept them and
- * do not store them, so sending a different value does not change the role.
- *
- * Form links are not plan-gated. A password, an expiration, or
- * `requireAccount` is stored on every plan.
+ * Unlike board and asset links, form links are not plan-gated. A password,
+ * an expiration, or `requireAccount` is stored on every plan and does not
+ * return `422 ADDON_DISABLED`.
  */
-export interface FormShareLinkWriteSettings {
-  active?: boolean;
-  allowDownload?: boolean;
-  /** Write only. `null` removes the password. */
-  password?: string | null;
-  /** ISO 8601 date-time in the future. `null` removes the expiration. */
-  expiresAt?: string | null;
-  requireAccount?: boolean;
-  comments?: ShareLinkCommentsAccess;
-  customFields?: ShareLinkCustomFieldsAccess;
-}
+export type FormShareLinkWriteSettings = ShareLinkWriteSettings;
 
 /** Body for `POST /boards/:boardId/forms/:formId/share-links`. */
 export type FormShareLinkCreateParams = FormShareLinkWriteSettings;
