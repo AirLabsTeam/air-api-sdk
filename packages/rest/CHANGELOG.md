@@ -1,5 +1,15 @@
 # @air/api-rest
 
+## 0.13.0
+
+### Minor Changes
+
+- 5e62003: Add board form methods (`listForms`, `createForm`, `updateForm`) and form share-link methods (`listFormShareLinks`, `createFormShareLink`, `updateFormShareLink`, `deleteFormShareLink`). A form share link uses the board share link type, including `expiresAt: string | null`. Field `type` includes `customField`.
+
+### Patch Changes
+
+- @air/api-core@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

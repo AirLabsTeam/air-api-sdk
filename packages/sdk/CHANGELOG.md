@@ -1,5 +1,13 @@
 # @air/api-sdk
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies [5e62003]
+  - @air/api-rest@0.13.0
+  - @air/api-core@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes
